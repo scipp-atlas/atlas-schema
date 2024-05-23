@@ -25,3 +25,13 @@
 [rtd-link]:                 https://atlas.readthedocs.io/en/latest/?badge=latest
 
 <!-- prettier-ignore-end -->
+
+## Developer Notes
+
+### Converting Enums from C++ to Python
+
+This useful `vim` substitution helps:
+
+```
+%s/    \([A-Za-z]\+\)\s\+=  \(\d\+\),\?/    \1: Annotated[int, "\1"] = \2
+```
