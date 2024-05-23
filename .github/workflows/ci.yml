@@ -57,7 +57,10 @@ jobs:
           allow-prereleases: true
 
       - name: Install package
-        run: python -m pip install .[test]
+        run: |
+          python -m pip install uv
+          uv pip install --system  --upgrade pip wheel
+          uv pip install .[test]
 
       - name: Test package
         run: >-
