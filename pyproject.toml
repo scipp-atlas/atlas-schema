@@ -66,6 +66,7 @@ version.source = "vcs"
 build.hooks.vcs.version-file = "src/atlas/_version.py"
 
 [tool.hatch.envs.default]
+installer = "uv"
 features = ["test"]
 scripts.test = "pytest -ra {args}"
 scripts.tag = "tbump {args}"
