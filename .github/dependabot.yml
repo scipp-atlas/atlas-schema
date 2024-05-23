@@ -9,3 +9,8 @@ updates:
       actions:
         patterns:
           - "*"
+    labels:
+      - "github-actions"
+      - "dependencies"
+    reviewers:
+      - "kratsg"
