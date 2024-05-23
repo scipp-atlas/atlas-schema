@@ -6,6 +6,8 @@ from typing import Any, ClassVar
 
 from coffea.nanoevents.schemas.base import BaseSchema, zip_forms
 
+from atlas.typing_compat import Behavior, Self
+
 
 class NtupleSchema(BaseSchema):  # type: ignore[misc]
     """Ntuple schema builder
@@ -58,7 +60,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
         "phi": "azimuthal angle",
     }
 
-    def __init__(self, base_form, version="latest"):
+    def __init__(self, base_form: dict[str, Any], version: str = "latest"):
         super().__init__(base_form)
         self._version = version
         if version == "latest":
@@ -71,7 +73,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
         self._form["parameters"]["metadata"]["version"] = self._version
 
     @classmethod
-    def v1(cls, base_form):
+    def v1(cls, base_form: dict[str, Any]) -> Self:
         """Build the NtupleEvents
 
         For example, one can use ``NanoEventsFactory.from_root("file.root", schemaclass=NtupleSchema.v1)``
@@ -80,7 +82,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
         return cls(base_form, version="1")
 
     def _build_collections(
-        self, field_names, input_contents
+        self, field_names: list[str], input_contents: list[Any]
     ) -> tuple[KeysView[str], ValuesView[dict[str, Any]]]:
         branch_forms = dict(zip(field_names, input_contents))
         # parse into high-level records (collections, list collections, and singletons)
@@ -195,7 +197,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
         return output.keys(), output.values()
 
     @classmethod
-    def behavior(cls):
+    def behavior(cls) -> Behavior:
         """Behaviors necessary to implement this schema"""
         from atlas.methods import behavior as roaster
 
