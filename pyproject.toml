@@ -30,7 +30,7 @@ classifiers = [
   "Typing :: Typed",
 ]
 dynamic = ["version"]
-dependencies = ["coffea[dask]"]
+dependencies = ["coffea[dask] >= 2024.4.1"]
 
 [project.optional-dependencies]
 test = [
