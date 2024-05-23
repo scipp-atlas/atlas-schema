@@ -10,8 +10,9 @@ from coffea.nanoevents.methods import base, candidate, vector
 from dask_awkward import dask_method
 
 from atlas.enums import PhotonID
+from atlas.typing_compat import Behavior
 
-behavior: dict[str, type[awkward.Record]] = {}
+behavior: Behavior = {}
 behavior.update(base.behavior)
 # vector behavior is included in candidate behavior
 behavior.update(candidate.behavior)
