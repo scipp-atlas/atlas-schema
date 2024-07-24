@@ -85,9 +85,11 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
         self, field_names: list[str], input_contents: list[Any]
     ) -> tuple[KeysView[str], ValuesView[dict[str, Any]]]:
         branch_forms = dict(zip(field_names, input_contents))
+
         # parse into high-level records (collections, list collections, and singletons)
         collections = {k.split("_")[0] for k in branch_forms}
         collections -= self.event_ids
+        collections -= set(self.singletons)
 
         # rename needed because easyjet breaks the AMG assumptions
         # https://gitlab.cern.ch/easyjet/easyjet/-/issues/246
