@@ -1,7 +1,6 @@
 [build-system]
-requires = ["hatchling", "hatch-vcs"]
+requires = ["hatchling>=0.7", "hatch-vcs"]
 build-backend = "hatchling.build"
-
 
 [project]
 name = "atlas-schema"
