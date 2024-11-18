@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from enum import IntEnum
 
-from atlas.typing_compat import Annotated
+from atlas_schema.typing_compat import Annotated
 
 
 # https://gitlab.cern.ch/atlas/athena/-/blob/74f43ff0910edb2a2bd3778880ccbdad648dc037/Generators/TruthUtils/TruthUtils/TruthClasses.h#L51-103

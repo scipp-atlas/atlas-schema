@@ -9,8 +9,8 @@ import awkward
 from coffea.nanoevents.methods import base, candidate, vector
 from dask_awkward import dask_method
 
-from atlas.enums import PhotonID
-from atlas.typing_compat import Behavior
+from atlas_schema.enums import PhotonID
+from atlas_schema.typing_compat import Behavior
 
 behavior: Behavior = {}
 behavior.update(base.behavior)

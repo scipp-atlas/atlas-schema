@@ -1,4 +1,4 @@
-# atlas
+# atlas-schema
 
 ```{toctree}
 :maxdepth: 2

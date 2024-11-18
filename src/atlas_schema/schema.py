@@ -6,7 +6,7 @@ from typing import Any, ClassVar
 
 from coffea.nanoevents.schemas.base import BaseSchema, zip_forms
 
-from atlas.typing_compat import Behavior, Self
+from atlas_schema.typing_compat import Behavior, Self
 
 
 class NtupleSchema(BaseSchema):  # type: ignore[misc]
@@ -201,6 +201,6 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
     @classmethod
     def behavior(cls) -> Behavior:
         """Behaviors necessary to implement this schema"""
-        from atlas.methods import behavior as roaster
+        from atlas_schema.methods import behavior as roaster
 
         return roaster

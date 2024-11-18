@@ -6,7 +6,7 @@ email: kratsg@gmail.com
 full_name: Giordon Stark
 license: Apache
 org: scipp-atlas
-project_name: atlas
+project_name: atlas-schema
 project_short_description: Helper python package for ATLAS HEP work.
-url: https://github.com/scipp-atlas/atlas
+url: https://github.com/scipp-atlas/atlas-schema
 vcs: true

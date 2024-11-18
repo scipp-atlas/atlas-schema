@@ -4,11 +4,11 @@ build-backend = "hatchling.build"
 
 
 [project]
-name = "atlas"
+name = "atlas-schema"
 authors = [
   { name = "Giordon Stark", email = "kratsg@gmail.com" },
 ]
-description = "Helper python package for ATLAS HEP work."
+description = "Helper python package for ATLAS Common NTuple Analysis work."
 readme = "README.md"
 license.file = "LICENSE"
 requires-python = ">=3.8"
@@ -55,15 +55,15 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/scipp-atlas/atlas"
-"Bug Tracker" = "https://github.com/scipp-atlas/atlas/issues"
-Discussions = "https://github.com/scipp-atlas/atlas/discussions"
-Changelog = "https://github.com/scipp-atlas/atlas/releases"
+Homepage = "https://github.com/scipp-atlas/atlas-schema"
+"Bug Tracker" = "https://github.com/scipp-atlas/atlas-schema/issues"
+Discussions = "https://github.com/scipp-atlas/atlas-schema/discussions"
+Changelog = "https://github.com/scipp-atlas/atlas-schema/releases"
 
 
 [tool.hatch]
 version.source = "vcs"
-build.hooks.vcs.version-file = "src/atlas/_version.py"
+build.hooks.vcs.version-file = "src/atlas_schema/_version.py"
 
 [tool.hatch.envs.default]
 installer = "uv"
@@ -94,7 +94,7 @@ testpaths = [
 
 
 [tool.coverage]
-run.source = ["atlas"]
+run.source = ["atlas_schema"]
 report.exclude_also = [
   '\.\.\.',
   'if typing.TYPE_CHECKING:',
@@ -113,7 +113,7 @@ warn_redundant_casts = true
 plugins = []
 
 [[tool.mypy.overrides]]
-module = "atlas.*"
+module = "atlas_schema.*"
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
 
@@ -126,7 +126,7 @@ ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = [
-  'atlas.methods.*',
+  'atlas_schema.methods.*',
 ]
 ignore_errors = true
 
@@ -165,7 +165,7 @@ ignore = [
 ]
 isort.required-imports = ["from __future__ import annotations"]
 # Uncomment if using a _compat.typing backport
-typing-modules = ["atlas.typing_compat"]
+typing-modules = ["atlas_schema.typing_compat"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["T20"]
