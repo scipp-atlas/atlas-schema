@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import importlib.metadata
 
-import atlas as m
+import atlas_schema as m
 
 
 def test_version():
-    assert importlib.metadata.version("atlas") == m.__version__
+    assert importlib.metadata.version("atlas-schema") == m.__version__
