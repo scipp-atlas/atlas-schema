@@ -5,14 +5,9 @@ Typing helpers.
 from __future__ import annotations
 
 import sys
-from typing import Dict, Type
+from typing import Annotated
 
 import awkward
-
-if sys.version_info >= (3, 9):
-    from typing import Annotated
-else:
-    from typing_extensions import Annotated
 
 if sys.version_info >= (3, 10):
     from typing import TypeAlias
@@ -24,6 +19,6 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import Self
 
-Behavior: TypeAlias = Dict[str, Type[awkward.Record]]
+Behavior: TypeAlias = dict[str, type[awkward.Record]]
 
 __all__ = ("Annotated", "Behavior", "Self")
