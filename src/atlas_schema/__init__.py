@@ -9,4 +9,4 @@ from __future__ import annotations
 from atlas_schema._version import version as __version__
 from atlas_schema.enums import ParticleOrigin, PhotonID
 
-__all__ = ["__version__", "ParticleOrigin", "PhotonID"]
+__all__ = ["ParticleOrigin", "PhotonID", "__version__"]
