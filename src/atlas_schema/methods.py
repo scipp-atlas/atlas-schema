@@ -169,13 +169,13 @@ _set_repr_name("Jet")
 
 
 __all__ = [
-    "NtupleEvents",
-    "Weight",
-    "Pass",
-    "MissingET",
-    "Particle",
-    "Photon",
     "Electron",
-    "Muon",
     "Jet",
+    "MissingET",
+    "Muon",
+    "NtupleEvents",
+    "Particle",
+    "Pass",
+    "Photon",
+    "Weight",
 ]
