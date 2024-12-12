@@ -6,10 +6,10 @@ from functools import reduce
 from operator import ior
 
 import awkward
+import particle
 import particle.pdgid.literals
 from coffea.nanoevents.methods import base, candidate, vector
 from dask_awkward import dask_method
-from particle import Particle
 
 from atlas_schema.enums import PhotonID
 from atlas_schema.typing_compat import Behavior
@@ -53,7 +53,7 @@ _set_repr_name("Pass")
 
 
 @awkward.mixin_class(behavior)
-class MassiveParticle(vector.PtEtaPhiMLorentzVector):
+class Particle(vector.PtEtaPhiMLorentzVector):
     """Generic particle collection that has Lorentz vector properties
 
     Also handles the following additional branches:
@@ -97,11 +97,11 @@ class MassiveParticle(vector.PtEtaPhiMLorentzVector):
     #     return dask_array[branch]
 
 
-_set_repr_name("MassiveParticle")
+_set_repr_name("Particle")
 
 
 @awkward.mixin_class(behavior)
-class MasslessParticle(MassiveParticle, base.NanoCollection):
+class MasslessParticle(Particle, base.NanoCollection):
     @property
     def mass(self):
         r"""Invariant mass (+, -, -, -)
@@ -150,40 +150,40 @@ _set_repr_name("Photon")
 
 
 @awkward.mixin_class(behavior)
-class Electron(MassiveParticle, base.NanoCollection, base.Systematic):
+class Electron(Particle, base.NanoCollection, base.Systematic):
     @property
     def mass(self):
         """Electron mass in GeV"""
-        return Particle.from_pdgid(particle.pdgid.literals.e_minus).mass / 1.0e3
+        return particle.literals.e_minus.mass / 1.0e3
 
 
 _set_repr_name("Electron")
 
 
 @awkward.mixin_class(behavior)
-class Muon(MassiveParticle, base.NanoCollection, base.Systematic):
+class Muon(Particle, base.NanoCollection, base.Systematic):
     @property
     def mass(self):
         """Muon mass in GeV"""
-        return Particle.from_pdgid(particle.pdgid.literals.mu_minus).mass / 1.0e3
+        return particle.literals.mu_minus.mass / 1.0e3
 
 
 _set_repr_name("Muon")
 
 
 @awkward.mixin_class(behavior)
-class Tau(MassiveParticle, base.NanoCollection, base.Systematic):
+class Tau(Particle, base.NanoCollection, base.Systematic):
     @property
     def mass(self):
         """Tau mass in GeV"""
-        return Particle.from_pdgid(particle.pdgid.literals.tau_minus).mass / 1.0e3
+        return particle.literals.tau_minus.mass / 1.0e3
 
 
 _set_repr_name("Tau")
 
 
 @awkward.mixin_class(behavior)
-class Jet(MassiveParticle, base.NanoCollection, base.Systematic): ...
+class Jet(Particle, base.NanoCollection, base.Systematic): ...
 
 
 _set_repr_name("Jet")
@@ -192,10 +192,10 @@ _set_repr_name("Jet")
 __all__ = [
     "Electron",
     "Jet",
-    "MassiveParticle",
     "MissingET",
     "Muon",
     "NtupleEvents",
+    "Particle",
     "Pass",
     "Photon",
     "Weight",
