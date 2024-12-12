@@ -7,7 +7,6 @@ from operator import ior
 
 import awkward
 import particle
-import particle.pdgid.literals
 from coffea.nanoevents.methods import base, candidate, vector
 from dask_awkward import dask_method
 
