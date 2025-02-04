@@ -21,9 +21,9 @@ behavior.update(candidate.behavior)
 
 class NtupleEvents(behavior["NanoEvents"]):  # type: ignore[misc, valid-type, name-defined]
     def __repr__(self):
-        return f"<event {getattr(self,'runNumber','??')}:\
-                {getattr(self,'eventNumber','??')}:\
-                {getattr(self,'mcChannelNumber','??')}>"
+        return f"<event {getattr(self, 'runNumber', '??')}:\
+                {getattr(self, 'eventNumber', '??')}:\
+                {getattr(self, 'mcChannelNumber', '??')}>"
 
 
 behavior["NanoEvents"] = NtupleEvents
