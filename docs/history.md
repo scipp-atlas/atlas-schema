@@ -1,4 +1,4 @@
-# atlas-schema history
+# Changelog
 
 ---
 
