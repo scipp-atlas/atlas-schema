@@ -5,7 +5,7 @@ from enum import IntEnum
 
 class ParticleType(IntEnum):
     """
-    `Docstring1 <https://google.com/>`_.
+    `Docstring1 <https://google.com/#1>`_.
     """
 
     Unknown = 0
@@ -52,7 +52,7 @@ class ParticleType(IntEnum):
 
 class ParticleOrigin(IntEnum):
     """
-    `Docstring2 <https://google.com/>`_.
+    `Docstring2 <https://google.com/#2>`_.
     """
 
     NonDefined = 0
@@ -107,7 +107,7 @@ class ParticleOrigin(IntEnum):
 
 class PhotonID(IntEnum):
     """
-    `Docstring3 <https://google.com/>`_.
+    `Docstring3 <https://google.com/#3>`_.
     """
 
     Rhad = 10  # ClusterHadronicLeakage_Photon
