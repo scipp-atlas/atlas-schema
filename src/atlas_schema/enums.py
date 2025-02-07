@@ -52,6 +52,8 @@ class ParticleType(IntEnum):
 
 class ParticleOrigin(IntEnum):
     """
+    Test.
+
     Taken from `ATLAS Truth Utilities <https://gitlab.cern.ch/atlas/athena/-/blob/74f43ff0910edb2a2bd3778880ccbdad648dc037/Generators/TruthUtils/TruthUtils/TruthClasses.h#L51-103>`_.
     """
 
