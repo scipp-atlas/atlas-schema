@@ -2,28 +2,15 @@
 
 ## Top-Level
 
-```{currentmodule}
-atlas_schema.schema
-```
-
-```{autosummary}
-:toctree: _generated/
-:nosignatures:
-
-NtupleSchema
+```{autodoc2-summary}
+atlas_schema.schema.NtupleSchema
 ```
 
 ## Enums
 
-```{currentmodule}
-atlas_schema.enums
-```
+```{autodoc2-summary}
 
-```{autosummary}
-:toctree: _generated/
-:nosignatures:
-
-ParticleType
-ParticleOrigin
-PhotonID
+atlas_schema.enums.ParticleType
+atlas_schema.enums.ParticleOrigin
+atlas_schema.enums.PhotonID
 ```
