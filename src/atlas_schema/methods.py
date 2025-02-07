@@ -50,6 +50,10 @@ class Pass(base.NanoCollection, base.Systematic): ...
 
 _set_repr_name("Pass")
 
+behavior.update(
+    awkward._util.copy_behaviors("PtEtaPhiMLorentzVector", "Particle", behavior)
+)
+
 
 @awkward.mixin_class(behavior)
 class Particle(vector.PtEtaPhiMLorentzVector):
@@ -98,42 +102,45 @@ class Particle(vector.PtEtaPhiMLorentzVector):
 
 _set_repr_name("Particle")
 
-
-@awkward.mixin_class(behavior)
-class MasslessParticle(Particle, base.NanoCollection):
-    @property
-    def mass(self):
-        r"""Invariant mass (+, -, -, -)
-
-        :math:`\sqrt{t^2-x^2-y^2-z^2}`
-        """
-        return 0.0 * self.pt
+ParticleArray.ProjectionClass2D = vector.TwoVectorArray  # noqa: F821
+ParticleArray.ProjectionClass3D = vector.ThreeVectorArray  # noqa: F821
+ParticleArray.ProjectionClass4D = ParticleArray  # noqa: F821
+ParticleArray.MomentumClass = vector.LorentzVectorArray  # noqa: F821
 
 
-_set_repr_name("MasslessParticle")
+behavior.update(awkward._util.copy_behaviors("PolarTwoVector", "MissingET", behavior))
 
 
 @awkward.mixin_class(behavior)
-class MissingET(MasslessParticle, base.NanoCollection, base.Systematic):
+class MissingET(vector.PolarTwoVector, base.NanoCollection, base.Systematic):
     @property
-    def pt(self):
-        """Alias for `r`"""
-        return self["met"] / 1.0e3
-
-    @property
-    def eta(self):
-        r"""Pseudorapidity
-
-        :math:`-\ln\tan(\theta/2) = \text{arcsinh}(z/r)`
-        """
-        return 0.0 * self.pt
+    def r(self):
+        """Distance from origin in XY plane"""
+        return self["met"]
 
 
 _set_repr_name("MissingET")
 
+MissingETArray.ProjectionClass2D = MissingETArray  # noqa: F821
+MissingETArray.ProjectionClass3D = vector.SphericalThreeVectorArray  # noqa: F821
+MissingETArray.ProjectionClass4D = vector.LorentzVectorArray  # noqa: F821
+MissingETArray.MomentumClass = MissingETArray  # noqa: F821
+
+behavior.update(awkward._util.copy_behaviors("Particle", "Photon", behavior))
+
 
 @awkward.mixin_class(behavior)
-class Photon(MasslessParticle, base.NanoCollection, base.Systematic):
+class Photon(Particle, base.NanoCollection, base.Systematic):
+    @property
+    def mass(self):
+        """Return zero mass for photon."""
+        return awkward.zeros_like(self.pt)
+
+    @property
+    def charge(self):
+        """Return zero charge for photon."""
+        return awkward.zeros_like(self.pt)
+
     @property
     def isEM(self):
         return self.isEM_syst.NOSYS == 0
@@ -147,6 +154,13 @@ class Photon(MasslessParticle, base.NanoCollection, base.Systematic):
 
 _set_repr_name("Photon")
 
+PhotonArray.ProjectionClass2D = vector.TwoVectorArray  # noqa: F821
+PhotonArray.ProjectionClass3D = vector.ThreeVectorArray  # noqa: F821
+PhotonArray.ProjectionClass4D = PhotonArray  # noqa: F821
+PhotonArray.MomentumClass = vector.LorentzVectorArray  # noqa: F821
+
+behavior.update(awkward._util.copy_behaviors("Particle", "Electron", behavior))
+
 
 @awkward.mixin_class(behavior)
 class Electron(Particle, base.NanoCollection, base.Systematic):
@@ -157,6 +171,13 @@ class Electron(Particle, base.NanoCollection, base.Systematic):
 
 
 _set_repr_name("Electron")
+
+ElectronArray.ProjectionClass2D = vector.TwoVectorArray  # noqa: F821
+ElectronArray.ProjectionClass3D = vector.ThreeVectorArray  # noqa: F821
+ElectronArray.ProjectionClass4D = ElectronArray  # noqa: F821
+ElectronArray.MomentumClass = vector.LorentzVectorArray  # noqa: F821
+
+behavior.update(awkward._util.copy_behaviors("Particle", "Muon", behavior))
 
 
 @awkward.mixin_class(behavior)
@@ -169,6 +190,13 @@ class Muon(Particle, base.NanoCollection, base.Systematic):
 
 _set_repr_name("Muon")
 
+MuonArray.ProjectionClass2D = vector.TwoVectorArray  # noqa: F821
+MuonArray.ProjectionClass3D = vector.ThreeVectorArray  # noqa: F821
+MuonArray.ProjectionClass4D = MuonArray  # noqa: F821
+MuonArray.MomentumClass = vector.LorentzVectorArray  # noqa: F821
+
+behavior.update(awkward._util.copy_behaviors("Particle", "Tau", behavior))
+
 
 @awkward.mixin_class(behavior)
 class Tau(Particle, base.NanoCollection, base.Systematic):
@@ -180,6 +208,14 @@ class Tau(Particle, base.NanoCollection, base.Systematic):
 
 _set_repr_name("Tau")
 
+TauArray.ProjectionClass2D = vector.TwoVectorArray  # noqa: F821
+TauArray.ProjectionClass3D = vector.ThreeVectorArray  # noqa: F821
+TauArray.ProjectionClass4D = TauArray  # noqa: F821
+TauArray.MomentumClass = vector.LorentzVectorArray  # noqa: F821
+
+
+behavior.update(awkward._util.copy_behaviors("Particle", "Jet", behavior))
+
 
 @awkward.mixin_class(behavior)
 class Jet(Particle, base.NanoCollection, base.Systematic): ...
@@ -187,6 +223,10 @@ class Jet(Particle, base.NanoCollection, base.Systematic): ...
 
 _set_repr_name("Jet")
 
+JetArray.ProjectionClass2D = vector.TwoVectorArray  # noqa: F821
+JetArray.ProjectionClass3D = vector.ThreeVectorArray  # noqa: F821
+JetArray.ProjectionClass4D = JetArray  # noqa: F821
+JetArray.MomentumClass = vector.LorentzVectorArray  # noqa: F821
 
 __all__ = [
     "Electron",
