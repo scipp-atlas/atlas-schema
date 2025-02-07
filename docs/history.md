@@ -22,8 +22,8 @@ and this project adheres to
 
 **_Changed:_**
 
-- migrated `MissingET` to `PolarTwoVector` :issue:`35`
+- migrated `MissingET` to `PolarTwoVector` ({issue}`35`)
 
 **_Added:_**
 
-- include underlying mixin support for :pypi:`vector` classes :issue:`34`
+- include underlying mixin support for :pypi:`vector` classes ({issue}`34`)
