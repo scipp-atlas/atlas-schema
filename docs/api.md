@@ -3,14 +3,27 @@
 ## Top-Level
 
 ```{currentmodule}
-atlas_schema
+atlas_schema.schema
 ```
 
 ```{autosummary}
 :toctree: _generated/
 :nosignatures:
 
-~atlas_schema.ParticleOrigin
-~atlas_schema.PhotonID
-~atlas_schema.schema.NtupleSchema
+NtupleSchema
+```
+
+## Enums
+
+```{currentmodule}
+atlas_schema.enums
+```
+
+```{autosummary}
+:toctree: _generated/
+:nosignatures:
+
+ParticleType
+ParticleOrigin
+PhotonID
 ```
