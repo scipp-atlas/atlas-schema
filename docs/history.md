@@ -16,7 +16,7 @@ and this project adheres to
 
 **_Fixed:_**
 
-(giordonatlas-schema-v0.2.1)=
+(atlas-schema-v0.2.1)=
 
 ## [0.2.1](https://github.com/scipp-atlas/atlas-schema/releases/tag/v0.2.1) - 2025-02-06
 
