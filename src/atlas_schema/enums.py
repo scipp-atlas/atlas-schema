@@ -52,7 +52,7 @@ class ParticleType(IntEnum):
 
 class ParticleOrigin(IntEnum):
     """
-    Taken2 from `ATLAS Truth Utilities <https://gitlab.cern.ch/atlas/athena/-/blob/74f43ff0910edb2a2bd3778880ccbdad648dc037/Generators/TruthUtils/TruthUtils/TruthClasses.h#L51-103>`_.
+    Taken from the `EGamma Identification CP group's twiki <https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/EGammaIdentificationRun2#Photon_isEM_word>`_.
     """
 
     NonDefined = 0
