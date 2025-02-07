@@ -5,7 +5,7 @@ from enum import IntEnum
 
 class ParticleType(IntEnum):
     """
-    Taken from `ATLAS Truth Utilities <https://gitlab.cern.ch/atlas/athena/-/blob/74f43ff0910edb2a2bd3778880ccbdad648dc037/Generators/TruthUtils/TruthUtils/TruthClasses.h#L8-49>`_.
+    Docstring1 <https://google.com/>`_.
     """
 
     Unknown = 0
@@ -52,7 +52,7 @@ class ParticleType(IntEnum):
 
 class ParticleOrigin(IntEnum):
     """
-    Taken from the `EGamma Identification CP group's twiki <https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/EGammaIdentificationRun2#Photon_isEM_word>`_.
+    Docstring2 <https://google.com/>`_.
     """
 
     NonDefined = 0
@@ -107,7 +107,7 @@ class ParticleOrigin(IntEnum):
 
 class PhotonID(IntEnum):
     """
-    Taken from the `EGamma Identification CP group's twiki <https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/EGammaIdentificationRun2#Photon_isEM_word>`_.
+    Docstring3 <https://google.com/>`_.
     """
 
     Rhad = 10  # ClusterHadronicLeakage_Photon
