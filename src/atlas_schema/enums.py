@@ -52,7 +52,7 @@ class ParticleType(IntEnum):
 
 class ParticleOrigin(IntEnum):
     """
-    `Docstring2 <https://google.com/#2>`_.
+    `Docstring2 <https://google.com/#1>`_.
     """
 
     NonDefined = 0
@@ -107,7 +107,7 @@ class ParticleOrigin(IntEnum):
 
 class PhotonID(IntEnum):
     """
-    `Docstring3 <https://google.com/#3>`_.
+    `Docstring3 <https://google.com/#1>`_.
     """
 
     Rhad = 10  # ClusterHadronicLeakage_Photon
