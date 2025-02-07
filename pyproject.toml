@@ -49,7 +49,6 @@ docs = [
   "myst_parser>=0.13",
   "sphinx-copybutton>=0.3.2,!=0.5.1",
   "sphinx_autodoc_typehints",
-  "sphinx-autodoc2",
   "furo>=2023.08.17",
   "sphinx-click",
   "ipywidgets",
