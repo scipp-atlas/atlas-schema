@@ -10,7 +10,7 @@ atlas_schema
 :toctree: _generated/
 :nosignatures:
 
-ParticleOrigin
-PhotonID
+~atlas_schema.ParticleOrigin
+~atlas_schema.PhotonID
 ~atlas_schema.schema.NtupleSchema
 ```
