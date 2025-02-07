@@ -3,7 +3,7 @@
 ```{toctree}
 :maxdepth: 2
 :hidden:
-  history
+history
 ```
 
 ```{include} ../README.md
