@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import importlib.metadata
 
-project = "atlas"
+project = "atlas-schema"
 copyright = "2024, Giordon Stark"
 author = "Giordon Stark"
-version = release = importlib.metadata.version("atlas")
+version = release = importlib.metadata.version("atlas-schema")
 
 extensions = [
     "myst_parser",
