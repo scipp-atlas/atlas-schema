@@ -22,8 +22,21 @@ and this project adheres to
 
 **_Changed:_**
 
-- migrated `MissingET` to `PolarTwoVector` ({issue}`35`)
+- migrated `MissingET` to `PolarTwoVector` ({issue}`35`, {pr}`36`)
+- mixin support for {pypi}`vector` classes ({issue}`34`, {pr}`36`)
 
 **_Added:_**
 
-- include underlying mixin support for {pypi}`vector` classes ({issue}`34`)
+- this documentation ({pr}`37`)
+
+## [0.2.0](https://github.com/scipp-atlas/atlas-schema/releases/tag/v0.2.0) - 2024-11-19
+
+**_Changed:_**
+
+- drop python 3.8
+
+## [0.1.0](https://github.com/scipp-atlas/atlas-schema/releases/tag/v0.1.0) - 2024-11-18
+
+**_Added:_**
+
+- first release of this package!
