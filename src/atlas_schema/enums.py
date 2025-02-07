@@ -3,8 +3,11 @@ from __future__ import annotations
 from enum import IntEnum
 
 
-# https://gitlab.cern.ch/atlas/athena/-/blob/74f43ff0910edb2a2bd3778880ccbdad648dc037/Generators/TruthUtils/TruthUtils/TruthClasses.h#L51-103
 class ParticleType(IntEnum):
+    """
+    This enum maps ParticleType from [ATLAS Truth Utilities](https://gitlab.cern.ch/atlas/athena/-/blob/74f43ff0910edb2a2bd3778880ccbdad648dc037/Generators/TruthUtils/TruthUtils/TruthClasses.h#L51-103).
+    """
+
     Unknown = 0
     UnknownElectron = 1
     IsoElectron = 2
@@ -47,8 +50,11 @@ class ParticleType(IntEnum):
     UnknownJet = 38
 
 
-# https://gitlab.cern.ch/atlas/athena/-/blob/74f43ff0910edb2a2bd3778880ccbdad648dc037/Generators/TruthUtils/TruthUtils/TruthClasses.h#L51-103
 class ParticleOrigin(IntEnum):
+    """
+    This enum maps ParticleOrigin from [ATLAS Truth Utilities](https://gitlab.cern.ch/atlas/athena/-/blob/74f43ff0910edb2a2bd3778880ccbdad648dc037/Generators/TruthUtils/TruthUtils/TruthClasses.h#L51-103).
+    """
+
     NonDefined = 0
     SingleElec = 1
     SingleMuon = 2
@@ -99,8 +105,11 @@ class ParticleOrigin(IntEnum):
     QCD = 45
 
 
-# https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/EGammaIdentificationRun2#Photon_isEM_word
 class PhotonID(IntEnum):
+    """
+    This enum maps PhotonID definitions from the [EGamma Identification CP group's twiki](https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/EGammaIdentificationRun2#Photon_isEM_word).
+    """
+
     Rhad = 10  # ClusterHadronicLeakage_Photon
     E277 = 11  # ClusterMiddleEnergy_Photon
     Reta = 12  # ClusterMiddleEratio37_Photon
