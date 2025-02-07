@@ -3,7 +3,8 @@
 ```{toctree}
 :maxdepth: 2
 :hidden:
-
+api
+history
 ```
 
 ```{include} ../README.md
