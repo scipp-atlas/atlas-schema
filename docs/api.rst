@@ -21,6 +21,6 @@ Enums
    :toctree: _generated/
    :nosignatures:
 
+   ParticleType
    ParticleOrigin
    PhotonID
-   ParticleType
