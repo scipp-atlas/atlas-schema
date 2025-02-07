@@ -26,4 +26,4 @@ and this project adheres to
 
 **_Added:_**
 
-- include underlying mixin support for :pypi:`vector` classes ({issue}`34`)
+- include underlying mixin support for {pypi}`vector` classes ({issue}`34`)
