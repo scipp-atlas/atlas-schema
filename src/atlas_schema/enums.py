@@ -1,9 +1,31 @@
 from __future__ import annotations
 
-from enum import IntEnum
+import sys
+from enum import Enum, IntEnum
+
+if sys.version_info >= (3, 11):
+    from enum import EnumType
+else:
+    from enum import EnumMeta as EnumType
+
+from typing import Callable, TypeVar, cast
+
+_E = TypeVar("_E", bound=Enum)
 
 
-class ParticleType(IntEnum):
+class MultipleEnumAccessMeta(EnumType):
+    """
+    Enum Metaclass to provide a way to access multiple values all at once.
+    """
+
+    def __getitem__(self: type[_E], key: str | tuple[str]) -> _E | list[_E]:  # type:ignore[misc,override]
+        getitem = cast(Callable[[str], _E], super().__getitem__)  # type:ignore[misc]
+        if isinstance(key, tuple):
+            return [getitem(name) for name in key]
+        return getitem(key)
+
+
+class ParticleType(IntEnum, metaclass=MultipleEnumAccessMeta):
     """
     Taken from `ATLAS Truth Utilities for ParticleType <https://gitlab.cern.ch/atlas/athena/-/blob/74f43ff0910edb2a2bd3778880ccbdad648dc037/Generators/TruthUtils/TruthUtils/TruthClasses.h#L8-49>`_.
     """
@@ -50,7 +72,7 @@ class ParticleType(IntEnum):
     UnknownJet = 38
 
 
-class ParticleOrigin(IntEnum):
+class ParticleOrigin(IntEnum, metaclass=MultipleEnumAccessMeta):
     """
     Taken from `ATLAS Truth Utilities for ParticleOrigin <https://gitlab.cern.ch/atlas/athena/-/blob/74f43ff0910edb2a2bd3778880ccbdad648dc037/Generators/TruthUtils/TruthUtils/TruthClasses.h#L51-103>`_.
     """
@@ -105,7 +127,7 @@ class ParticleOrigin(IntEnum):
     QCD = 45
 
 
-class PhotonID(IntEnum):
+class PhotonID(IntEnum, metaclass=MultipleEnumAccessMeta):
     """
     Taken from the `EGamma Identification CP group's twiki <https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/EGammaIdentificationRun2#Photon_isEM_word>`_.
     """
