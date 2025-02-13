@@ -10,7 +10,8 @@ import warnings
 
 from atlas_schema._version import version as __version__
 from atlas_schema.enums import ParticleOrigin, PhotonID
+from atlas_schema.utils import isin
 
 warnings.filterwarnings("ignore", module="coffea.*")
 
-__all__ = ["ParticleOrigin", "PhotonID", "__version__"]
+__all__ = ["ParticleOrigin", "PhotonID", "__version__", "isin"]
