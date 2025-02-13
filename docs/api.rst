@@ -24,3 +24,15 @@ Enums
    ParticleType
    ParticleOrigin
    PhotonID
+
+
+Functions
+---------
+
+.. currentmodule:: atlas_schema
+
+.. autosummary::
+   :toctree: _generated/
+   :nosignatures:
+
+   isin
