@@ -100,12 +100,12 @@ addopts = [
   "--strict-markers",
   "--strict-config",
   "--doctest-modules",
-  "--doctest-glob='*.rst'",
-  "--doctest-glob='*.md'",
+  "--doctest-glob=*.rst",
   "--cov",
   "--cov-report=xml",
   "--cov-report=term",
   "--durations=20",
+  "--ignore=docs/conf.py",
 ]
 xfail_strict = true
 filterwarnings = [
@@ -114,6 +114,7 @@ filterwarnings = [
 log_cli_level = "INFO"
 testpaths = [
   "tests",
+  "docs",
 ]
 
 [tool.coverage]
