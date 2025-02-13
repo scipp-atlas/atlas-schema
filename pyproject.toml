@@ -94,7 +94,7 @@ packages = ["src/atlas_schema"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config", "--doctest-modules"]
+addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config", "--doctest-modules", "--doctest-glob='*.rst'", "--doctest-glob='*.md'"]
 xfail_strict = true
 filterwarnings = [
   "error",
