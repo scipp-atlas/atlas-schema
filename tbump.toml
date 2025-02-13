@@ -31,6 +31,10 @@ src = "tbump.toml"
 search = "Bump version: {current_version} → "
 
 [[file]]
+src = "pyproject.toml"
+search = "en/v{current_version}"
+
+[[file]]
 src = "README.md"
 
 [[field]]

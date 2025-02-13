@@ -60,7 +60,9 @@ docs = [
 Homepage = "https://github.com/scipp-atlas/atlas-schema"
 "Bug Tracker" = "https://github.com/scipp-atlas/atlas-schema/issues"
 Discussions = "https://github.com/scipp-atlas/atlas-schema/discussions"
-Changelog = "https://github.com/scipp-atlas/atlas-schema/releases"
+Documentation = "https://atlas-schema.readthedocs.io/en/v0.2.1/"
+Releases = "https://github.com/scipp-atlas/atlas-schema/releases"
+"Release Notes" = "https://atlas-schema.readthedocs.io/en/latest/history.html"
 
 
 [tool.hatch]
