@@ -52,7 +52,6 @@ repos:
     hooks:
       - id: mypy
         files: src|tests
-        pass_filenames: false
         args: []
         additional_dependencies:
           - pytest
