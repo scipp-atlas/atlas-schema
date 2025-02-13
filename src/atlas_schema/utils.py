@@ -19,7 +19,7 @@ def isin(haystack: Array, needles: dak.Array | ak.Array) -> Array:
         needles (dak.Array[K] or ak.Array[K]): one-dimensional set of needles to find in haystack.
 
     Returns:
-        mask (dak.Array[N*M] or ak.Array[N*M]): result of comparison for needles in haystack
+        dak.Array[N*M] or ak.Array[N*M]: result of comparison for needles in haystack
     """
     # Note: the colon indicates where the other dimension is for readability
     return cast(Array, ak.any(haystack == needles[None, None, :], axis=-1))
