@@ -76,6 +76,7 @@ myst_enable_extensions = [
 intersphinx_mapping = get_intersphinx_mapping(
     packages={
         "python",
+        "numpy",
     }
 )
 
