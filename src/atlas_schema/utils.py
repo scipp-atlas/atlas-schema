@@ -12,10 +12,12 @@ _E = TypeVar("_E", bound=Enum)
 
 def isin(haystack: Array, needles: dak.Array | ak.Array, axis: int = -1) -> Array:
     """
-    Find needles in haystack.
+    Find needles in haystack. Similar in API as :func:`numpy.isin`.
 
-    This works by first transforming needles to an array with one more
-    dimension than the haystack, placing the needles at axis, and then doing a
+    Calculates `haystack in needles`, broadcasting over *haystack elements only*. Returns a boolean array of the same shape as *haystack* that is `True` where an element of *element* is in *needles* and `False` otherwise.
+
+    This works by first transforming *needles* to an array with one more
+    dimension than the *haystack*, placing the *needles* at *axis*, and then doing a
     comparison.
 
     Args:
@@ -25,6 +27,14 @@ def isin(haystack: Array, needles: dak.Array | ak.Array, axis: int = -1) -> Arra
 
     Returns:
         dak.Array or ak.Array: result of comparison for needles in haystack
+
+    Example:
+        >>> import awkward as ak
+        >>> import atlas_schema as ats
+        >>> truth_origins = ak.Array([[1, 2, 3], [4], [5, 6, 7], [1]])
+        >>> prompt_origins = ak.Array([1, 2, 7])
+        >>> ats.isin(truth_origins, prompt_origins).to_list()
+        [[True, True, False], [False], [False, False, True], [True]]
     """
     assert needles.ndim == 1, "Needles must be one-dimensional"
     assert axis >= -1, "axis must be -1 or positive-valued"
