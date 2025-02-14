@@ -115,6 +115,7 @@ filterwarnings = [
 ]
 log_cli_level = "INFO"
 testpaths = [
+  "src",
   "tests",
   "docs",
 ]

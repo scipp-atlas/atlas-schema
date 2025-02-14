@@ -69,6 +69,8 @@ html_theme_options: dict[str, Any] = {
     "source_directory": "docs/",
 }
 
+html_static_path = ["_static"]
+
 myst_enable_extensions = [
     "colon_fence",
 ]
@@ -76,6 +78,7 @@ myst_enable_extensions = [
 intersphinx_mapping = get_intersphinx_mapping(
     packages={
         "python",
+        "numpy",
     }
 )
 
