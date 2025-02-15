@@ -45,7 +45,6 @@ samples, report = dataset_tools.preprocess(fileset)
 
 def noop(events):
     return ak.fields(events)
-    return events
 
 
 fields = dataset_tools.apply_to_fileset(noop, samples, schemaclass=NtupleSchema)
