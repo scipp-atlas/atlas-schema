@@ -186,7 +186,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
                 contents = output[name]["contents"]
             elif output[name]["class"] == "NumpyArray":
                 # these are singletons that we just pass through
-                pass
+                continue
             else:
                 msg = f"Unhandled class {output[name]['class']}"
                 raise RuntimeError(msg)
