@@ -14,7 +14,9 @@ How do I...
 
    .. code-block:: bash
 
-      RuntimeWarning: I identified a branch that likely does not have any leaves: RandomRunNumber. I will treat this as a 'singleton'. To suppress this warning next time, please define your singletons explicitly.
+      RuntimeWarning: I identified a branch that likely does not have any
+      leaves: RandomRunNumber. I will treat this as a 'singleton'. To suppress
+      this warning next time, please define your singletons explicitly.
 
    You can define your singletons by inheriting from :class:`atlas_schema.schema.NtupleSchema`:
 
