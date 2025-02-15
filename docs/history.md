@@ -25,7 +25,7 @@ and this project adheres to
 - Singleton branches were not handled properly in some ntuples used by `ATLAS`
   analyzers. Now, the schema will raise a {class}`RuntimeWarning` if the user
   does not explicitly define the singletons they have in their input files. See
-  additionally the [faq]() for some details as well. ({issue}`19`, {pr}`48`)
+  additionally the {ref}`faq` for some details as well. ({issue}`19`, {pr}`48`)
 
 (atlas-schema-v0.2.2)=
 
