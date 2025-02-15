@@ -34,7 +34,7 @@ jobs:
         continue-on-error: true
         run: |
           echo "::add-matcher::$GITHUB_WORKSPACE/.github/matchers/pylint.json"
-          pipx run nox[uv] -s pylint
+          pipx run nox[uv] -s pylint -- --output-format=github
 
   checks:
     name: Check Python ${{ matrix.python-version }} on ${{ matrix.runs-on }}
