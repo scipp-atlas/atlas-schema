@@ -1,7 +1,7 @@
 .. _faq:
 
-atlas-schema FAQ
-==========
+FAQ
+===
 
 This is a list of Frequently Asked Questions about ``atlas-schema``.  Feel free to
 suggest new entries!
