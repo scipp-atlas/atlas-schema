@@ -49,7 +49,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
     }
 
     # These are stored as length-1 vectors unnecessarily
-    singletons: ClassVar[list[str]] = []
+    singletons: ClassVar[set[str]] = set()
 
     docstrings: ClassVar[dict[str, str]] = {
         "charge": "charge",
@@ -127,8 +127,8 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
 
         output = {}
 
-        # first, register the event-level stuff directly
-        for name in self.event_ids:
+        # first, register singletons (event-level, others)
+        for name in {*self.event_ids, *self.singletons}:
             if name in missing_event_ids:
                 continue
             output[name] = branch_forms[name]
@@ -163,7 +163,18 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
                 }
             )
 
-            output[name] = zip_forms(content, name, record_name=mixin)
+            if not used and not content:
+                warnings.warn(
+                    f"I identified a branch that likely does not have any leaves: {name}.\n\
+                    I will treat this as a 'singleton'. To suppress this warning next time, please define your singletons explicitly.",
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
+                self.singletons.add(name)
+                output[name] = branch_forms[name]
+
+            else:
+                output[name] = zip_forms(content, name, record_name=mixin)
 
             output[name].setdefault("parameters", {})
             output[name]["parameters"].update({"collection_name": name})
@@ -174,6 +185,9 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
             elif output[name]["class"] == "RecordArray":
                 parameters = output[name]["fields"]
                 contents = output[name]["contents"]
+            elif output[name]["class"] == "NumpyArray":
+                # these are singletons that we just pass through
+                pass
             else:
                 msg = f"Unhandled class {output[name]['class']}"
                 raise RuntimeError(msg)
@@ -190,11 +204,6 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
                         "__doc__", "no docstring available"
                     ),
                 )
-
-            if name in self.singletons:
-                # flatten! this 'promotes' the content of an inner dimension
-                # upwards, effectively hiding one nested dimension
-                output[name] = output[name]["content"]
 
         return output.keys(), output.values()
 
