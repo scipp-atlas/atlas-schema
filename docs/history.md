@@ -14,6 +14,19 @@ and this project adheres to
 
 **_Fixed:_**
 
+(atlas-schema-v0.2.3)=
+
+## [0.2.3](https://github.com/scipp-atlas/atlas-schema/releases/tag/v0.2.3) - 2025-02-15
+
+**_Changed:_**
+
+**_Fixed:_**
+
+- Singleton branches were not handled properly in some ntuples used by `ATLAS`
+  analyzers. Now, the schema will raise a {class}`RuntimeWarning` if the user
+  does not explicitly define the singletons they have in their input files. See
+  additionally the {ref}`faq` for some details as well. ({issue}`19`, {pr}`48`)
+
 (atlas-schema-v0.2.2)=
 
 ## [0.2.2](https://github.com/scipp-atlas/atlas-schema/releases/tag/v0.2.2) - 2025-02-13

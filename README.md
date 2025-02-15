@@ -32,6 +32,54 @@ analyzers to work with ATLAS datasets (Monte Carlo and Data), using
 
 ## Hello World
 
+The simplest example is to just get started processing the file as expected:
+
+```python
+from atlas_schema.schema import NtupleSchema
+from coffea import dataset_tools
+import awkward as ak
+
+fileset = {"ttbar": {"files": {"path/to/ttbar.root": "tree_name"}}}
+samples, report = dataset_tools.preprocess(fileset)
+
+
+def noop(events):
+    return ak.fields(events)
+
+
+fields = dataset_tools.apply_to_fileset(noop, samples, schemaclass=NtupleSchema)
+print(fields)
+```
+
+which produces something similar to
+
+```python
+{
+    "ttbar": [
+        "dataTakingYear",
+        "mcChannelNumber",
+        "runNumber",
+        "eventNumber",
+        "lumiBlock",
+        "actualInteractionsPerCrossing",
+        "averageInteractionsPerCrossing",
+        "truthjet",
+        "PileupWeight",
+        "RandomRunNumber",
+        "met",
+        "recojet",
+        "truth",
+        "generatorWeight",
+        "beamSpotWeight",
+        "trigPassed",
+        "jvt",
+    ]
+}
+```
+
+However, a more involved example to apply a selection and fill a histogram looks
+like below:
+
 ```python
 import awkward as ak
 import dask
