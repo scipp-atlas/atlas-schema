@@ -5,6 +5,7 @@
 :hidden:
 api
 history
+faq
 ```
 
 ```{include} ../README.md
