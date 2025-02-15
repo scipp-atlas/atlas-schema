@@ -165,7 +165,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
 
             if not used and not content:
                 warnings.warn(
-                    f"I identified a branch that likely does not have any leaves: {name}. I will treat this as a 'singleton'. To suppress this warning next time, please define your singletons explicitly.",
+                    f"I identified a branch that likely does not have any leaves: '{name}'. I will treat this as a 'singleton'. To suppress this warning next time, please define your singletons explicitly.",
                     RuntimeWarning,
                     stacklevel=2,
                 )
