@@ -63,7 +63,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
     Mixins (collections, subcollections)
     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    In more complicated scenarios, you might need to teach :class:`NtupleSchema` how to handle collections that end up having underscores in their name, or other characters that make the grouping non-trivial. In some other scenarios, you want to tell the schema to assign a certain set of behaviors to a collection - rather than the default :class:`atlas_schema.methods.Particle` behavior. This is where ``mixins`` comes in. Similar to how ``singletons`` are handled, you extend this schema to include your own mixins pointing them at one of the behaviors defined in :module:`atlas_schema.methods`.
+    In more complicated scenarios, you might need to teach :class:`NtupleSchema` how to handle collections that end up having underscores in their name, or other characters that make the grouping non-trivial. In some other scenarios, you want to tell the schema to assign a certain set of behaviors to a collection - rather than the default :class:`atlas_schema.methods.Particle` behavior. This is where ``mixins`` comes in. Similar to how ``singletons`` are handled, you extend this schema to include your own mixins pointing them at one of the behaviors defined in :mod:`atlas_schema.methods`.
 
     Let's demonstrate both cases. Imagine you want to have your ``truthel`` collections above treated as :class:`atlas_schema.methods.Electron`, then you would extend the existing ``mixins``:
 
