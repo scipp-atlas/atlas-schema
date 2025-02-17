@@ -45,7 +45,8 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
 
     Sometimes this logic is not what you want, and there are ways to teach ``NtupleSchema`` how to group some of these better for atypical cases. We can address these case-by-case.
 
-    ## Singletons
+    Singletons
+    ----------
 
     Sometimes you have particular branches that you don't want to be treated as a collection (with subcollections). And sometimes you will see warnings about this (see :ref:`faq`). There are some pre-defined ``singletons`` stored under :attr:`event_ids`, and these will be lazily treated as a _singleton_. For other cases where you add your own branches, you can additionally extend this class to add your own ``singletons``:
 
@@ -59,7 +60,8 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
 
     and use this schema in your analysis code. The rest of the logic will be handled for you, and you can access your singletons under ``events.RandomRunNumber`` as expected.
 
-    ## Mixins (collections, subcollections)
+    Mixins (collections, subcollections)
+    ------------------------------------
 
     In more complicated scenarios, you might need to teach :class:`NtupleSchema` how to handle collections that end up having underscores in their name, or other characters that make the grouping non-trivial. In some other scenarios, you want to tell the schema to assign a certain set of behaviors to a collection - rather than the default :class:`atlas_schema.methods.Particle` behavior. This is where ``mixins`` comes in. Similar to how ``singletons`` are handled, you extend this schema to include your own mixins pointing them at one of the behaviors defined in :module:`atlas_schema.methods`.
 
