@@ -15,7 +15,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
     The Ntuple schema is built from all branches found in the supplied file, based on
     the naming pattern of the branches. This naming pattern is assumed to be
 
-    .. code-block: bash
+    .. code-block:: bash
 
        {collection:str}_{subcollection:str}_{systematic:str}
 
@@ -49,7 +49,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
 
     Sometimes you have particular branches that you don't want to be treated as a collection (with subcollections). And sometimes you will see warnings about this (see :ref:`faq`). There are some pre-defined ``singletons`` stored under :attr:`event_ids`, and these will be lazily treated as a _singleton_. For other cases where you add your own branches, you can additionally extend this class to add your own ``singletons``:
 
-    .. code-block: python
+    .. code-block:: python
 
        from atlas_schema.schema import NtupleSchema
 
@@ -65,7 +65,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
 
     Let's demonstrate both cases. Imagine you want to have your ``truthel`` collections above treated as :class:`atlas_schema.methods.Electron`, then you would extend the existing ``mixins``:
 
-    .. code-block: python
+    .. code-block:: python
 
        from atlas_schema.schema import NtupleSchema
 
@@ -77,7 +77,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
 
     If instead, you run into problems with mixing different branches in the same collection, because the default behavior of this schema described above is not smart enough to handle the atypical cases, you can explicitly fix this by defining your collections:
 
-    .. code-block: python
+    .. code-block:: python
 
        from atlas_schema.schema import NtupleSchema
 
