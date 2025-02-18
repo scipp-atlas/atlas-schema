@@ -171,7 +171,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
         for mixin in self.mixins:
             if mixin in collections:
                 continue
-            if f",{mixin}_" not in bf_str and bf_str.startswith(f"{mixin}_"):
+            if f",{mixin}_" not in bf_str and not bf_str.startswith(f"{mixin}_"):
                 continue
             if "_" in mixin:
                 warnings.warn(
@@ -179,7 +179,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
                     RuntimeWarning,
                     stacklevel=2,
                 )
-
+            print(f"adding {mixin}")
             collections.add(mixin)
             for collection in list(collections):
                 if mixin.startswith(f"{collection}_"):
