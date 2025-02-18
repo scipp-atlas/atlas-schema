@@ -184,7 +184,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
             for collection in list(collections):
                 if mixin.startswith(f"{collection}_"):
                     warnings.warn(
-                        f"I found a misidentified collection: '{mixin}'. I will remove this from the known collections. To suppress this warning next time, please create your ntuples with collections that are not similarly named with underscores.",
+                        f"I found a misidentified collection: '{collection}'. I will remove this from the known collections. To suppress this warning next time, please create your ntuples with collections that are not similarly named with underscores.",
                         RuntimeWarning,
                         stacklevel=2,
                     )
