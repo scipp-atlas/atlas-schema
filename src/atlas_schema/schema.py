@@ -233,6 +233,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
                 continue
             output[name] = branch_forms[name]
 
+        print(f"identified collections: {collections}")
         # next, go through and start grouping up collections
         for name in collections:
             mixin = self.mixins.get(name, "")
