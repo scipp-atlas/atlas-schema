@@ -165,6 +165,32 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
         collections -= self.event_ids
         collections -= set(self.singletons)
 
+        # now handle any collections that we identified that are substrings of the items in the mixins
+        # convert all valid branch_forms into strings to make the lookups a bit faster
+        bf_str = ",".join(branch_forms.keys())
+        for mixin in self.mixins:
+            if mixin in collections:
+                continue
+            if f",{mixin}_" not in bf_str and bf_str.startswith(f"{mixin}_"):
+                continue
+            if "_" in mixin:
+                warnings.warn(
+                    f"I identified a mixin that I did not automatically identify as a collection because it contained an underscore: '{mixin}'. I will add this to the known collections. To suppress this warning next time, please create your ntuples with collections without underscores.",
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
+
+            collections.add(mixin)
+            for collection in list(collections):
+                if mixin.startswith(f"{collection}_"):
+                    warnings.warn(
+                        f"I found a misidentified collection: '{mixin}'. I will remove this from the known collections. To suppress this warning next time, please create your ntuples with collections that are not similarly named with underscores.",
+                        RuntimeWarning,
+                        stacklevel=2,
+                    )
+                    collections.remove(collection)
+                    break
+
         # rename needed because easyjet breaks the AMG assumptions
         # https://gitlab.cern.ch/easyjet/easyjet/-/issues/246
         for k in list(branch_forms):
@@ -209,7 +235,14 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
 
         # next, go through and start grouping up collections
         for name in collections:
-            mixin = self.mixins.get(name, "NanoCollection")
+            mixin = self.mixins.get(name, "")
+            if not mixin:
+                warnings.warn(
+                    f"I found a collection with no defined mixin: '{name}'. I will assume general coffea.nanoevents.methods.base.NanoCollection behavior. To suppress this warning next time, please define mixins for your custom collections.",
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
+                mixin = "NanoCollection"
             content = {}
             used = set()
 
