@@ -315,8 +315,12 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
             output[name]["parameters"].update({"collection_name": name})
 
             if output[name]["class"] == "ListOffsetArray":
-                parameters = output[name]["content"]["fields"]
-                contents = output[name]["content"]["contents"]
+                if output[name]["class"] == "RecordArray":
+                    parameters = output[name]["content"]["fields"]
+                    contents = output[name]["content"]["contents"]
+                else:
+                    # these are also singletons of another kind that we just pass through
+                    continue
             elif output[name]["class"] == "RecordArray":
                 parameters = output[name]["fields"]
                 contents = output[name]["contents"]
