@@ -5,7 +5,7 @@ Typing helpers.
 from __future__ import annotations
 
 import sys
-from typing import Annotated
+from typing import Annotated, Literal, Union
 
 import awkward
 
@@ -19,6 +19,6 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import Self
 
-Behavior: TypeAlias = dict[str, type[awkward.Record]]
+Behavior: TypeAlias = dict[Union[str, tuple[Literal["*"]], str], type[awkward.Record]]
 
 __all__ = ("Annotated", "Behavior", "Self")

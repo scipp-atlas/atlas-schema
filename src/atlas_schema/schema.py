@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import difflib
 import warnings
 from collections.abc import KeysView, ValuesView
 from typing import Any, ClassVar
@@ -96,6 +97,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
 
     warn_missing_crossrefs = True
     error_missing_event_ids = False
+    identify_closest_behavior = True
 
     event_ids_data: ClassVar[set[str]] = {
         "lumiBlock",
@@ -179,7 +181,6 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
                     RuntimeWarning,
                     stacklevel=2,
                 )
-            print(f"adding {mixin}")
             collections.add(mixin)
             for collection in list(collections):
                 if mixin.startswith(f"{collection}_"):
@@ -233,17 +234,17 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
                 continue
             output[name] = branch_forms[name]
 
-        print(f"identified collections: {collections}")
         # next, go through and start grouping up collections
         for name in collections:
-            mixin = self.mixins.get(name, "")
-            if not mixin:
+            behavior = self.mixins.get(name, "")
+            if not behavior:
+                behavior = self.suggested_behavior(name)
                 warnings.warn(
-                    f"I found a collection with no defined mixin: '{name}'. I will assume general coffea.nanoevents.methods.base.NanoCollection behavior. To suppress this warning next time, please define mixins for your custom collections.",
+                    f"I found a collection with no defined mixin: '{name}'. I will assume behavior: '{behavior}'. To suppress this warning next time, please define mixins for your custom collections.",
                     RuntimeWarning,
                     stacklevel=2,
                 )
-                mixin = "NanoCollection"
+                behavior = "NanoCollection"
             content = {}
             used = set()
 
@@ -281,7 +282,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
                 output[name] = branch_forms[name]
 
             else:
-                output[name] = zip_forms(content, name, record_name=mixin)
+                output[name] = zip_forms(content, name, record_name=behavior)
 
             output[name].setdefault("parameters", {})
             output[name]["parameters"].update({"collection_name": name})
@@ -320,3 +321,13 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
         from atlas_schema.methods import behavior as roaster
 
         return roaster
+
+    def suggested_behavior(self, key: str, cutoff: float = 0.4) -> str:
+        default_behavior = "NanoCollection"
+        if self.identify_closest_behavior:
+            behaviors = [b for b in self.behavior() if isinstance(b, str)]
+            results = difflib.get_close_matches(
+                key, [b.lower() for b in behaviors], n=1, cutoff=cutoff
+            ) or [default_behavior]
+            return results[0]
+        return default_behavior
