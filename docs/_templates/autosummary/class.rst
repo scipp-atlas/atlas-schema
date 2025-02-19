@@ -27,7 +27,7 @@
    {% endif %}
 
    {% for item in members %}
-   {% if item not in attributes and item not in inherited_members %}
+   {% if item not in attributes and item not in inherited_members and not item.startswith('__') %}
    .. automethod:: {{ name }}.{{ item }}
    {% endif %}
    {%- endfor %}
