@@ -321,6 +321,8 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
                 msg = f"Unhandled class {output[name]['class']}"
                 raise RuntimeError(msg)
 
+            if output[name]["class"] == "RecordArray":
+                breakpoint()
             if output[name]["content"]["class"] == "RecordArray":
                 parameters = output[name]["content"]["fields"]
                 contents = output[name]["content"]["contents"]
