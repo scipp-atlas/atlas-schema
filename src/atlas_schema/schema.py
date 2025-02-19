@@ -49,7 +49,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
 
     **Singletons**
 
-     Sometimes you have particular branches that you don't want to be treated as a collection (with subcollections). And sometimes you will see warnings about this (see :ref:`faq`). There are some pre-defined ``singletons`` stored under :attr:`event_ids`, and these will be lazily treated as a _singleton_. For other cases where you add your own branches, you can additionally extend this class to add your own ``singletons``:
+     Sometimes you have particular branches that you don't want to be treated as a collection (with subcollections). And sometimes you will see warnings about this (see :ref:`faq`). There are some pre-defined ``singletons`` stored under :attr:`event_ids`, and these will be lazily treated as a _singleton_. For other cases where you add your own branches, you can additionally extend this class to add your own :attr:`singletons`:
 
      .. code-block:: python
 
@@ -63,9 +63,9 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
 
     **Mixins (collections, subcollections)**
 
-     In more complicated scenarios, you might need to teach :class:`NtupleSchema` how to handle collections that end up having underscores in their name, or other characters that make the grouping non-trivial. In some other scenarios, you want to tell the schema to assign a certain set of behaviors to a collection - rather than the default :class:`atlas_schema.methods.Particle` behavior. This is where ``mixins`` comes in. Similar to how ``singletons`` are handled, you extend this schema to include your own mixins pointing them at one of the behaviors defined in :mod:`atlas_schema.methods`.
+     In more complicated scenarios, you might need to teach :class:`NtupleSchema` how to handle collections that end up having underscores in their name, or other characters that make the grouping non-trivial. In some other scenarios, you want to tell the schema to assign a certain set of behaviors to a collection - rather than the default :class:`atlas_schema.methods.Particle` behavior. This is where :attr:`mixins` comes in. Similar to how :attr:`singletons` are handled, you extend this schema to include your own ``mixins`` pointing them at one of the behaviors defined in :mod:`atlas_schema.methods`.
 
-     Let's demonstrate both cases. Imagine you want to have your ``truthel`` collections above treated as :class:`atlas_schema.methods.Electron`, then you would extend the existing ``mixins``:
+     Let's demonstrate both cases. Imagine you want to have your ``truthel`` collections above treated as :class:`atlas_schema.methods.Electron`, then you would extend the existing :attr:`mixins`:
 
      .. code-block:: python
 
@@ -100,7 +100,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
 
     #: Treat missing event-level branches as error instead of warning (default is ``False``)
     error_missing_event_ids: ClassVar[bool] = False
-    #: Determine closest behavior for a given branch or treat branch as :attr:`~atlas_schema.schema.NtupleSchema.default_behavior` (default is ``True``)
+    #: Determine closest behavior for a given branch or treat branch as :attr:`default_behavior` (default is ``True``)
     identify_closest_behavior: ClassVar[bool] = True
 
     #: event IDs to expect in data datasets
@@ -345,7 +345,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
         Default behavior: :class:`~coffea.nanoevents.methods.base.NanoCollection`.
 
         Note:
-            If :attr:`NtupleSchema.identify_closest_behavior` is ``False``, then this function will return the default behavior ``NanoCollection``.
+            If :attr:`identify_closest_behavior` is ``False``, then this function will return the default behavior ``NanoCollection``.
 
         Warning:
             If no behavior is found above the *cutoff* score, then this function will return the default behavior.
