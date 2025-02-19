@@ -11,10 +11,11 @@ from atlas_schema.typing_compat import Behavior, Self
 
 
 class NtupleSchema(BaseSchema):  # type: ignore[misc]
-    """Ntuple schema builder
+    """The schema for building ATLAS ntuples following the typical centralized formats.
 
-    The Ntuple schema is built from all branches found in the supplied file, based on
-    the naming pattern of the branches. This naming pattern is assumed to be
+    This schema is built from all branches found in a tree in the supplied
+    file, based on the naming pattern of the branches. This naming pattern is
+    typically assumed to be
 
     .. code-block:: bash
 
