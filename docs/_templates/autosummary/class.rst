@@ -5,8 +5,6 @@
 .. autoclass:: {{ objname }}
    :show-inheritance:
 
-   .. automethod:: __init__
-
    {% block attributes %}
    {% if attributes %}
    .. rubric:: {{ _('Attributes') }}
@@ -24,8 +22,12 @@
    {% if methods %}
    .. rubric:: {{ _('Methods') }}
 
+   {% if 'enums' not in fullname %}
+   .. automethod:: {{ name }}.__init__
+   {% endif %}
+
    {% for item in members %}
-   {% if item not in attributes and item not in inherited_members and not item.startswith('__') %}
+   {% if item not in attributes and item not in inherited_members %}
    .. automethod:: {{ name }}.{{ item }}
    {% endif %}
    {%- endfor %}
