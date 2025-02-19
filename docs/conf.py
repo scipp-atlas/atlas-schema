@@ -83,8 +83,8 @@ intersphinx_mapping = get_intersphinx_mapping(
 )
 intersphinx_mapping.update(
     {
-        "awkward": ("https://awkward-array.org/doc/main/objects.inv", None),
-        "coffea": ("https://coffea-hep.readthedocs.io/en/latest/objects.inv", None),
+        "awkward": ("https://awkward-array.org/doc/main/", None),
+        "coffea": ("https://coffea-hep.readthedocs.io/en/latest/", None),
     }
 )
 
