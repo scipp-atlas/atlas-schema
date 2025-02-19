@@ -13,84 +13,86 @@ from atlas_schema.typing_compat import Behavior, Self
 class NtupleSchema(BaseSchema):  # type: ignore[misc]
     """Ntuple schema builder
 
-     The Ntuple schema is built from all branches found in the supplied file, based on
-     the naming pattern of the branches. This naming pattern is assumed to be
+    The Ntuple schema is built from all branches found in the supplied file, based on
+    the naming pattern of the branches. This naming pattern is assumed to be
 
-     .. code-block:: bash
+    .. code-block:: bash
 
-        {collection:str}_{subcollection:str}_{systematic:str}
+       {collection:str}_{subcollection:str}_{systematic:str}
 
-     where:
-       * ``collection`` is assumed to be a prefix with typical characters, following the regex ``[a-zA-Z][a-zA-Z0-9]*``; that is starting with a case-insensitive letter, and proceeded by zero or more alphanumeric characters,
-       * ``subcollection`` is assumed to be anything with typical characters (allowing for underscores) following the regex ``[a-zA-Z_][a-zA-Z0-9_]*``; that is starting with a case-insensitive letter or underscore, and proceeded by zero or more alphanumeric characters including underscores, and
-       * ``systematic`` is assumed to be either ``NOSYS`` to indicate a branch with potential systematic variariations, or anything with typical characters (allowing for underscores) following the same regular expression as the ``subcollection``.
+    where:
+      * ``collection`` is assumed to be a prefix with typical characters, following the regex ``[a-zA-Z][a-zA-Z0-9]*``; that is starting with a case-insensitive letter, and proceeded by zero or more alphanumeric characters,
+      * ``subcollection`` is assumed to be anything with typical characters (allowing for underscores) following the regex ``[a-zA-Z_][a-zA-Z0-9_]*``; that is starting with a case-insensitive letter or underscore, and proceeded by zero or more alphanumeric characters including underscores, and
+      * ``systematic`` is assumed to be either ``NOSYS`` to indicate a branch with potential systematic variariations, or anything with typical characters (allowing for underscores) following the same regular expression as the ``subcollection``.
 
-     Here, a collection refers to the top-level entry to access an item - a collection called ``el`` will be accessible under the ``el`` attributes via ``events['el']`` or ``events.el``. A subcollection called ``pt`` will be accessible under that collection, such as ``events['el']['pt']`` or ``events.el.pt``. This is the power of the schema providing a more user-friendly (and programmatic) access to the underlying branches.
+    Here, a collection refers to the top-level entry to access an item - a collection called ``el`` will be accessible under the ``el`` attributes via ``events['el']`` or ``events.el``. A subcollection called ``pt`` will be accessible under that collection, such as ``events['el']['pt']`` or ``events.el.pt``. This is the power of the schema providing a more user-friendly (and programmatic) access to the underlying branches.
 
-     The above logic means that the following branches below will be categorized as ``(collection, subcollection, systematic)`` tuples:
-       * ``actualInteractionsPerCrossing``: ``('actualInteractionsPerCrossing', None, None)``
-       * ``eventNumber``: ``('eventNumber', None, None)``
-       * ``runNumber``: ``('runNumber', None, None)``
-       * ``el_pt_NOSYS``: ``('el', 'pt', 'NOSYS')``
-       * ``jet_cleanTightBad_NOSYS``: ``('jet', 'cleanTightBad', 'NOSYS')``
-       * ``jet_select_btag_NOSYS``: ``('jet', 'select_btag', 'NOSYS')``
-       * ``jet_e_NOSYS``: ``('jet', 'e', 'NOSYS')``
-       * ``truthel_phi``: ``('truthel', 'phi', None)``
-       * ``truthel_pt``: ``('truthel', 'pt', None)``
-       * ``ph_eta``: ``('ph', 'eta', None)``
-       * ``ph_phi``: ``('ph', 'phi', None)``
-       * ``mu_TTVA_effSF_baseline_NOSYS``: ``('mu', 'TTVA_effSF_baseline', 'NOSYS')``
-       * ``recojet_antikt4PFlow_passesOR_MUON_SAGITTA_RESBIAS__1up``: ``('recojet', 'antikt4PFlow_passesOR', 'MUON_SAGITTA_RESBIAS__1up')``
-       * ``recojet_antikt4PFlow_passesOR_NOSYS``: ``('recojet', 'antikt4PFlow_passesOR', 'NOSYS')``
-       * ``recojet_antikt10UFO_m``: ``('recojet', 'antikt10UFO_m', None)``
+    The above logic means that the following branches below will be categorized as ``(collection, subcollection, systematic)`` tuples:
+      * ``actualInteractionsPerCrossing``: ``('actualInteractionsPerCrossing', None, None)``
+      * ``eventNumber``: ``('eventNumber', None, None)``
+      * ``runNumber``: ``('runNumber', None, None)``
+      * ``el_pt_NOSYS``: ``('el', 'pt', 'NOSYS')``
+      * ``jet_cleanTightBad_NOSYS``: ``('jet', 'cleanTightBad', 'NOSYS')``
+      * ``jet_select_btag_NOSYS``: ``('jet', 'select_btag', 'NOSYS')``
+      * ``jet_e_NOSYS``: ``('jet', 'e', 'NOSYS')``
+      * ``truthel_phi``: ``('truthel', 'phi', None)``
+      * ``truthel_pt``: ``('truthel', 'pt', None)``
+      * ``ph_eta``: ``('ph', 'eta', None)``
+      * ``ph_phi``: ``('ph', 'phi', None)``
+      * ``mu_TTVA_effSF_baseline_NOSYS``: ``('mu', 'TTVA_effSF_baseline', 'NOSYS')``
+      * ``recojet_antikt4PFlow_passesOR_MUON_SAGITTA_RESBIAS__1up``: ``('recojet', 'antikt4PFlow_passesOR', 'MUON_SAGITTA_RESBIAS__1up')``
+      * ``recojet_antikt4PFlow_passesOR_NOSYS``: ``('recojet', 'antikt4PFlow_passesOR', 'NOSYS')``
+      * ``recojet_antikt10UFO_m``: ``('recojet', 'antikt10UFO_m', None)``
 
-     Sometimes this logic is not what you want, and there are ways to teach ``NtupleSchema`` how to group some of these better for atypical cases. We can address these case-by-case.
+    Sometimes this logic is not what you want, and there are ways to teach ``NtupleSchema`` how to group some of these better for atypical cases. We can address these case-by-case.
 
-     **Singletons**
+    **Singletons**
 
-     Sometimes you have particular branches that you don't want to be treated as a collection (with subcollections). And sometimes you will see warnings about this (see :ref:`faq`). There are some pre-defined ``singletons`` stored under :attr:`event_ids`, and these will be lazily treated as a _singleton_. For other cases where you add your own branches, you can additionally extend this class to add your own ``singletons``:
+    Sometimes you have particular branches that you don't want to be treated as a collection (with subcollections). And sometimes you will see warnings about this (see :ref:`faq`). There are some pre-defined ``singletons`` stored under :attr:`event_ids`, and these will be lazily treated as a _singleton_. For other cases where you add your own branches, you can additionally extend this class to add your own ``singletons``:
 
-     .. code-block:: python
+    .. code-block:: python
 
-        from atlas_schema.schema import NtupleSchema
-
-
-        class MySchema(NtupleSchema):
-            singletons = {"RandomRunNumber"}
-
-     and use this schema in your analysis code. The rest of the logic will be handled for you, and you can access your singletons under ``events.RandomRunNumber`` as expected.
-
-    **Mixins (collections, subcollections)**
-
-     In more complicated scenarios, you might need to teach :class:`NtupleSchema` how to handle collections that end up having underscores in their name, or other characters that make the grouping non-trivial. In some other scenarios, you want to tell the schema to assign a certain set of behaviors to a collection - rather than the default :class:`atlas_schema.methods.Particle` behavior. This is where ``mixins`` comes in. Similar to how ``singletons`` are handled, you extend this schema to include your own mixins pointing them at one of the behaviors defined in :mod:`atlas_schema.methods`.
-
-     Let's demonstrate both cases. Imagine you want to have your ``truthel`` collections above treated as :class:`atlas_schema.methods.Electron`, then you would extend the existing ``mixins``:
-
-     .. code-block:: python
-
-        from atlas_schema.schema import NtupleSchema
+       from atlas_schema.schema import NtupleSchema
 
 
-        class MySchema(NtupleSchema):
-            mixins = {"truthel": "Electron", **NtupleSchema.mixins}
+       class MySchema(NtupleSchema):
+           singletons = {"RandomRunNumber"}
 
-     Now, ``events.truthel`` will give you arrays zipped up with :class:`atlas_schema.methods.Electron` behaviors.
+    and use this schema in your analysis code. The rest of the logic will be handled for you, and you can access your singletons under ``events.RandomRunNumber`` as expected.
 
-     If instead, you run into problems with mixing different branches in the same collection, because the default behavior of this schema described above is not smart enough to handle the atypical cases, you can explicitly fix this by defining your collections:
+    *Mixins (collections, subcollections)**
 
-     .. code-block:: python
+    In more complicated scenarios, you might need to teach :class:`NtupleSchema` how to handle collections that end up having underscores in their name, or other characters that make the grouping non-trivial. In some other scenarios, you want to tell the schema to assign a certain set of behaviors to a collection - rather than the default :class:`atlas_schema.methods.Particle` behavior. This is where ``mixins`` comes in. Similar to how ``singletons`` are handled, you extend this schema to include your own mixins pointing them at one of the behaviors defined in :mod:`atlas_schema.methods`.
 
-        from atlas_schema.schema import NtupleSchema
+    Let's demonstrate both cases. Imagine you want to have your ``truthel`` collections above treated as :class:`atlas_schema.methods.Electron`, then you would extend the existing ``mixins``:
+
+    .. code-block:: python
+
+       from atlas_schema.schema import NtupleSchema
 
 
-        class MySchema(NtupleSchema):
-            mixins = {
-                "recojet_antikt4PFlow": "Jet",
-                "recojet_antikt10UFO": "Jet",
-                **NtupleSchema.mixins,
-            }
+       class MySchema(NtupleSchema):
+           mixins = {"truthel": "Electron", **NtupleSchema.mixins}
 
-     Now, ``events.recojet_antikt4PFlow`` and ``events.recojet_antikt10UFO`` will be separate collections, instead of a single ``events.recojet`` that incorrectly merged branches from each of these collections.
+    Now, ``events.truthel`` will give you arrays zipped up with :class:`atlas_schema.methods.Electron` behaviors.
+
+    If instead, you run into problems with mixing different branches in the same collection, because the default behavior of this schema described above is not smart enough to handle the atypical cases, you can explicitly fix this by defining your collections:
+
+    .. code-block:: python
+
+       from atlas_schema.schema import NtupleSchema
+
+
+       class MySchema(NtupleSchema):
+           mixins = {
+               "recojet_antikt4PFlow": "Jet",
+               "recojet_antikt10UFO": "Jet",
+               **NtupleSchema.mixins,
+           }
+
+    Now, ``events.recojet_antikt4PFlow`` and ``events.recojet_antikt10UFO`` will be separate collections, instead of a single ``events.recojet`` that incorrectly merged branches from each of these collections.
+
+    :class:`coffea.nanoevents.methods.base.NanoCollection`
     """
 
     __dask_capable__ = True
