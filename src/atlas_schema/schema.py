@@ -94,14 +94,14 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
      Now, ``events.recojet_antikt4PFlow`` and ``events.recojet_antikt10UFO`` will be separate collections, instead of a single ``events.recojet`` that incorrectly merged branches from each of these collections.
     """
 
-    __dask_capable__: bool = True
+    __dask_capable__: ClassVar[bool] = True
 
-    warn_missing_crossrefs: bool = True
+    warn_missing_crossrefs: ClassVar[bool] = True
 
     #: Treat missing event-level branches as error instead of warning (default is ``False``)
-    error_missing_event_ids: bool = False
+    error_missing_event_ids: ClassVar[bool] = False
     #: Determine closest behavior for a given branch or treat branch as :attr:`~atlas_schema.schema.NtupleSchema.default_behavior` (default is ``True``)
-    identify_closest_behavior: bool = True
+    identify_closest_behavior: ClassVar[bool] = True
 
     #: event IDs to expect in data datasets
     event_ids_data: ClassVar[set[str]] = {
@@ -146,7 +146,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
     }
 
     #: default behavior to use for any collection (default ``"NanoCollection"``, from :class:`coffea.nanoevents.methods.base.NanoCollection`)
-    default_behavior: str = "NanoCollection"
+    default_behavior: ClassVar[str] = "NanoCollection"
 
     def __init__(self, base_form: dict[str, Any], version: str = "latest"):
         super().__init__(base_form)
