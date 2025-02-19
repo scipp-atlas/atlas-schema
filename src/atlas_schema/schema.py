@@ -97,9 +97,9 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
 
     warn_missing_crossrefs = True
 
-    #: bool: Treat missing event-level branches as error instead of warning (default: False)
+    #: bool: Treat missing event-level branches as error instead of warning (default is ``False``)
     error_missing_event_ids = False
-    #: bool: Determine closest behavior for a given branch or treat branch as :attr:`NtupleSchema.default_behavior` (default: True)
+    #: bool: Determine closest behavior for a given branch or treat branch as :attr:`NtupleSchema.default_behavior` (default is ``True``)
     identify_closest_behavior = True
 
     #: set[str]: event IDs to expect in data datasets
@@ -144,7 +144,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
         "phi": "azimuthal angle",
     }
 
-    #: str: default behavior to use for any collection (default: "NanoCollection", from :class:`coffea.nanoevents.methods.base.NanoCollection`)
+    #: str: default behavior to use for any collection (default ``"NanoCollection"``, from :class:`coffea.nanoevents.methods.base.NanoCollection`)
     default_behavior: str = "NanoCollection"
 
     def __init__(self, base_form: dict[str, Any], version: str = "latest"):
