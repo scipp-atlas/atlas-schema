@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import ClassVar
 from uuid import uuid4
 
 import awkward as ak
@@ -85,3 +86,15 @@ def test_undefined_mixin(minimum_required_fields):
         assert "recojet" in ak.fields(events)
         assert isinstance(events.recojet, NanoCollectionArray)
         assert isinstance(events.recojet[0, 0], NanoCollection)
+
+    class MySchema(NtupleSchema):
+        mixins: ClassVar[dict[str, str]] = {"recojet": "Jet", **NtupleSchema.mixins}
+
+    src = SimplePreloadedColumnSource(array, uuid4(), 3, object_path="/Events")
+    events = NanoEventsFactory.from_preloaded(
+        src, metadata={"dataset": "test"}, schemaclass=MySchema
+    ).events()
+
+    assert "recojet" in ak.fields(events)
+    assert isinstance(events.recojet, JetArray)
+    assert isinstance(events.recojet[0, 0], JetRecord)
