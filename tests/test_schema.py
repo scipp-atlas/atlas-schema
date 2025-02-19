@@ -43,10 +43,29 @@ def test_simple_load(minimum_required_fields):
     assert len(events) == 3
     assert events.ndim == 1
     assert events.jet.ndim == 2
+    assert "pt" in ak.fields(events.jet)
+    assert "eta" in ak.fields(events.jet)
     assert ak.all(events.jet.pt[0] == [10, 15])
     assert ak.all(events.jet.eta[1] == [])
     assert isinstance(events.jet, JetArray)
     assert isinstance(events.jet[0, 0], JetRecord)
+
+
+def test_easyjet_nosys_placement(minimum_required_fields):
+    array = {
+        **minimum_required_fields,
+        "jet_NOSYS_pt": ak.Array([[10.0, 15.0], [], [12.5]]),
+        "jet_eta": ak.Array([[0.5, 1.8], [], [1.2]]),
+        "jet_phi": ak.Array([[0.01, 1.2], [], [0.8]]),
+    }
+    src = SimplePreloadedColumnSource(array, uuid4(), 3, object_path="/Events")
+    events = NanoEventsFactory.from_preloaded(
+        src, metadata={"dataset": "test"}, schemaclass=NtupleSchema
+    ).events()
+
+    assert "pt" in ak.fields(events.jet)
+    assert "pt_syst" in ak.fields(events.jet)
+    assert "NOSYS" in ak.fields(events.jet.pt_syst)
 
 
 def test_undefined_mixin(minimum_required_fields):
