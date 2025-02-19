@@ -56,11 +56,12 @@ def test_undefined_mixin(minimum_required_fields):
         "recojet_eta": ak.Array([[0.5, 1.8], [], [1.2]]),
         "recojet_phi": ak.Array([[0.01, 1.2], [], [0.8]]),
     }
+    src = SimplePreloadedColumnSource(array, uuid4(), 3, object_path="/Events")
+
     with pytest.warns(
         RuntimeWarning,
-        match="I found a collection with no defined mixin: 'recojet'. I will assume behavior: 'Jet'.",
+        match=r"I found a collection with no defined mixin: 'recojet'. I will assume behavior: 'Jet'..*[mixin-undefined]",
     ):
-        src = SimplePreloadedColumnSource(array, uuid4(), 3, object_path="/Events")
         events = NanoEventsFactory.from_preloaded(
             src, metadata={"dataset": "test"}, schemaclass=NtupleSchema
         ).events()
@@ -74,11 +75,10 @@ def test_undefined_mixin(minimum_required_fields):
     with (
         pytest.warns(
             RuntimeWarning,
-            match="I found a collection with no defined mixin: 'recojet'. I will assume behavior: 'NanoCollection'.",
+            match=r"I found a collection with no defined mixin: 'recojet'. I will assume behavior: 'NanoCollection'..*[mixin-undefined]",
         ),
         attr_as(NtupleSchema, "identify_closest_behavior", False),
     ):
-        src = SimplePreloadedColumnSource(array, uuid4(), 3, object_path="/Events")
         events = NanoEventsFactory.from_preloaded(
             src, metadata={"dataset": "test"}, schemaclass=NtupleSchema
         ).events()
@@ -90,7 +90,6 @@ def test_undefined_mixin(minimum_required_fields):
     class MySchema(NtupleSchema):
         mixins: ClassVar[dict[str, str]] = {"recojet": "Jet", **NtupleSchema.mixins}
 
-    src = SimplePreloadedColumnSource(array, uuid4(), 3, object_path="/Events")
     events = NanoEventsFactory.from_preloaded(
         src, metadata={"dataset": "test"}, schemaclass=MySchema
     ).events()
@@ -98,3 +97,58 @@ def test_undefined_mixin(minimum_required_fields):
     assert "recojet" in ak.fields(events)
     assert isinstance(events.recojet, JetArray)
     assert isinstance(events.recojet[0, 0], JetRecord)
+
+
+def test_underscored_mixin(minimum_required_fields):
+    array = {
+        **minimum_required_fields,
+        "recojet_antikt4PFlow_pt": ak.Array([[10.0, 15.0], [], [12.5]]),
+        "recojet_antikt4PFlow_eta": ak.Array([[0.5, 1.8], [], [1.2]]),
+        "recojet_antikt10UFO_m": ak.Array([[], [10.0], []]),
+        "recojet_antikt10UFO_eta": ak.Array([[], [1.2], []]),
+    }
+    src = SimplePreloadedColumnSource(array, uuid4(), 3, object_path="/Events")
+
+    with (
+        pytest.warns(
+            RuntimeWarning,
+            match=r"I found a collection with no defined mixin: 'recojet'. I will assume behavior: 'Jet'..*[mixin-undefined]",
+        ),
+        pytest.raises(
+            TypeError, match=r"size of array \(\d+\) is less than size of form \(\d+\)"
+        ),
+    ):
+        NanoEventsFactory.from_preloaded(
+            src, metadata={"dataset": "test"}, schemaclass=NtupleSchema
+        ).events()
+
+    class MySchema(NtupleSchema):
+        mixins: ClassVar[dict[str, str]] = {
+            "recojet_antikt4PFlow": "Jet",
+            "recojet_antikt10UFO": "Jet",
+            **NtupleSchema.mixins,
+        }
+
+    with (
+        pytest.warns(
+            RuntimeWarning,
+            match=r"I identified a mixin that I did not automatically identify as a collection because it contained an underscore: 'recojet_antikt4PFlow'..*[mixin-underscore]",
+        ),
+        pytest.warns(
+            RuntimeWarning,
+            match=r"I identified a mixin that I did not automatically identify as a collection because it contained an underscore: 'recojet_antikt10UFO'..*[mixin-underscore]",
+        ),
+        pytest.warns(
+            RuntimeWarning,
+            match=r"I found a misidentified collection: 'recojet'. I will remove this from the known collections..*[collection-subset]",
+        ),
+    ):
+        events = NanoEventsFactory.from_preloaded(
+            src, metadata={"dataset": "test"}, schemaclass=MySchema
+        ).events()
+
+        assert len(events) == 3
+        assert events.ndim == 1
+        assert "recojet" not in ak.fields(events)
+        assert "recojet_antikt4PFlow" in ak.fields(events)
+        assert "recojet_antikt10UFO" in ak.fields(events)

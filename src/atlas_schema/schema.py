@@ -204,7 +204,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
                 continue
             if "_" in mixin:
                 warnings.warn(
-                    f"I identified a mixin that I did not automatically identify as a collection because it contained an underscore: '{mixin}'. I will add this to the known collections. To suppress this warning next time, please create your ntuples with collections without underscores.",
+                    f"I identified a mixin that I did not automatically identify as a collection because it contained an underscore: '{mixin}'. I will add this to the known collections. To suppress this warning next time, please create your ntuples with collections without underscores. [mixin-underscore]",
                     RuntimeWarning,
                     stacklevel=2,
                 )
@@ -212,7 +212,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
             for collection in list(collections):
                 if mixin.startswith(f"{collection}_"):
                     warnings.warn(
-                        f"I found a misidentified collection: '{collection}'. I will remove this from the known collections. To suppress this warning next time, please create your ntuples with collections that are not similarly named with underscores.",
+                        f"I found a misidentified collection: '{collection}'. I will remove this from the known collections. To suppress this warning next time, please create your ntuples with collections that are not similarly named with underscores. [collection-subset]",
                         RuntimeWarning,
                         stacklevel=2,
                     )
@@ -267,7 +267,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
             if not behavior:
                 behavior = self.suggested_behavior(name)
                 warnings.warn(
-                    f"I found a collection with no defined mixin: '{name}'. I will assume behavior: '{behavior}'. To suppress this warning next time, please define mixins for your custom collections.",
+                    f"I found a collection with no defined mixin: '{name}'. I will assume behavior: '{behavior}'. To suppress this warning next time, please define mixins for your custom collections. [mixin-undefined]",
                     RuntimeWarning,
                     stacklevel=2,
                 )
