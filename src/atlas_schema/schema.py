@@ -380,6 +380,8 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
             'Electron'
             >>> NtupleSchema.suggested_behavior("generatorWeight")
             'Weight'
+            >>> NtupleSchema.suggested_behavior("aVeryStrangelyNamedBranchWithNoMatch")
+            'NanoCollection'
         """
         if cls.identify_closest_behavior:
             # lowercase everything to do case-insensitive matching
