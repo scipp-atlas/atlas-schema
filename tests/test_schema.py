@@ -15,7 +15,7 @@ from atlas_schema.schema import NtupleSchema
 
 
 @pytest.fixture
-def minimum_required_fields():
+def event_id_fields():
     return {
         "eventNumber": ak.Array([[123456789], [123456790], [123456791]]),
         "runNumber": ak.Array([[654321], [654321], [654321]]),
@@ -28,12 +28,19 @@ def minimum_required_fields():
     }
 
 
-def test_simple_load(minimum_required_fields):
-    array = {
-        **minimum_required_fields,
-        "jet_pt": ak.Array([[10.0, 15.0], [], [12.5]]),
+@pytest.fixture
+def jet_array_fields():
+    return {
+        "jet_pt_NOSYS": ak.Array([[10.0, 15.0], [], [12.5]]),
         "jet_eta": ak.Array([[0.5, 1.8], [], [1.2]]),
         "jet_phi": ak.Array([[0.01, 1.2], [], [0.8]]),
+    }
+
+
+def test_minimum(event_id_fields, jet_array_fields):
+    array = {
+        **event_id_fields,
+        **jet_array_fields,
     }
     src = SimplePreloadedColumnSource(array, uuid4(), 3, object_path="/Events")
     events = NanoEventsFactory.from_preloaded(
@@ -43,17 +50,59 @@ def test_simple_load(minimum_required_fields):
     assert len(events) == 3
     assert events.ndim == 1
     assert events.jet.ndim == 2
-    assert "pt" in ak.fields(events.jet)
-    assert "eta" in ak.fields(events.jet)
+    assert set(ak.fields(events.jet)) == {"pt", "pt_syst", "eta", "phi"}
+    assert set(ak.fields(events)) == {
+        "lumiBlock",
+        "runNumber",
+        "actualInteractionsPerCrossing",
+        "eventNumber",
+        "mcEventWeights",
+        "mcChannelNumber",
+        "averageInteractionsPerCrossing",
+        "dataTakingYear",
+        "jet",
+    }
+    assert set(ak.fields(events.jet)) == {"pt", "pt_syst", "eta", "phi"}
+    assert set(ak.fields(events.jet.pt_syst)) == {
+        "NOSYS",
+    }
     assert ak.all(events.jet.pt[0] == [10, 15])
     assert ak.all(events.jet.eta[1] == [])
     assert isinstance(events.jet, JetArray)
     assert isinstance(events.jet[0, 0], JetRecord)
 
 
-def test_easyjet_nosys_placement(minimum_required_fields):
+def test_minimum_no_event(jet_array_fields):
+    array = {**jet_array_fields}
+
+    with pytest.warns(
+        RuntimeWarning,
+        match=r"Missing event_ids",
+    ):
+        src = SimplePreloadedColumnSource(array, uuid4(), 3, object_path="/Events")
+        events = NanoEventsFactory.from_preloaded(
+            src, metadata={"dataset": "test"}, schemaclass=NtupleSchema
+        ).events()
+
+    assert len(events) == 3
+    assert events.ndim == 1
+    assert events.jet.ndim == 2
+    assert set(ak.fields(events)) == {
+        "jet",
+    }
+    assert set(ak.fields(events.jet)) == {"pt", "pt_syst", "eta", "phi"}
+    assert set(ak.fields(events.jet.pt_syst)) == {
+        "NOSYS",
+    }
+    assert ak.all(events.jet.pt[0] == [10, 15])
+    assert ak.all(events.jet.eta[1] == [])
+    assert isinstance(events.jet, JetArray)
+    assert isinstance(events.jet[0, 0], JetRecord)
+
+
+def test_easyjet_nosys_placement(event_id_fields):
     array = {
-        **minimum_required_fields,
+        **event_id_fields,
         "jet_NOSYS_pt": ak.Array([[10.0, 15.0], [], [12.5]]),
         "jet_eta": ak.Array([[0.5, 1.8], [], [1.2]]),
         "jet_phi": ak.Array([[0.01, 1.2], [], [0.8]]),
@@ -63,14 +112,15 @@ def test_easyjet_nosys_placement(minimum_required_fields):
         src, metadata={"dataset": "test"}, schemaclass=NtupleSchema
     ).events()
 
-    assert "pt" in ak.fields(events.jet)
-    assert "pt_syst" in ak.fields(events.jet)
-    assert "NOSYS" in ak.fields(events.jet.pt_syst)
+    assert set(ak.fields(events.jet)) == {"pt", "pt_syst", "eta", "phi"}
+    assert set(ak.fields(events.jet.pt_syst)) == {
+        "NOSYS",
+    }
 
 
-def test_undefined_mixin(minimum_required_fields):
+def test_undefined_mixin(event_id_fields):
     array = {
-        **minimum_required_fields,
+        **event_id_fields,
         "recojet_pt": ak.Array([[10.0, 15.0], [], [12.5]]),
         "recojet_eta": ak.Array([[0.5, 1.8], [], [1.2]]),
         "recojet_phi": ak.Array([[0.01, 1.2], [], [0.8]]),
@@ -118,9 +168,9 @@ def test_undefined_mixin(minimum_required_fields):
     assert isinstance(events.recojet[0, 0], JetRecord)
 
 
-def test_underscored_mixin(minimum_required_fields):
+def test_underscored_mixin(event_id_fields):
     array = {
-        **minimum_required_fields,
+        **event_id_fields,
         "recojet_antikt4PFlow_pt": ak.Array([[10.0, 15.0], [], [12.5]]),
         "recojet_antikt4PFlow_eta": ak.Array([[0.5, 1.8], [], [1.2]]),
         "recojet_antikt10UFO_m": ak.Array([[], [10.0], []]),
