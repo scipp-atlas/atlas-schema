@@ -230,12 +230,24 @@ JetArray.MomentumClass = vector.LorentzVectorArray  # noqa: F821
 
 __all__ = [
     "Electron",
+    "ElectronArray",  # noqa: F822
+    "ElectronRecord",  # noqa: F822
     "Jet",
+    "JetArray",  # noqa: F822
+    "JetRecord",  # noqa: F822
     "MissingET",
+    "MissingETArray",  # noqa: F822
+    "MissingETRecord",  # noqa: F822
     "Muon",
+    "MuonArray",  # noqa: F822
+    "MuonRecord",  # noqa: F822
     "NtupleEvents",
     "Particle",
+    "ParticleArray",  # noqa: F822
+    "ParticleRecord",  # noqa: F822
     "Pass",
     "Photon",
+    "PhotonArray",  # noqa: F822
+    "PhotonRecord",  # noqa: F822
     "Weight",
 ]

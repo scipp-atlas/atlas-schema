@@ -111,13 +111,17 @@ addopts = [
 ]
 xfail_strict = true
 filterwarnings = [
-  "error",
+    "error",
 ]
+
 log_cli_level = "INFO"
 testpaths = [
   "src",
   "tests",
   "docs",
+]
+norecursedirs = [
+  "tests/helpers"
 ]
 
 [tool.coverage]

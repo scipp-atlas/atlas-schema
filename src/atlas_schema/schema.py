@@ -136,6 +136,8 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
         "phi": "azimuthal angle",
     }
 
+    default_behavior = "NanoCollection"
+
     def __init__(self, base_form: dict[str, Any], version: str = "latest"):
         super().__init__(base_form)
         self._version = version
@@ -244,7 +246,6 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
                     RuntimeWarning,
                     stacklevel=2,
                 )
-                behavior = "NanoCollection"
             content = {}
             used = set()
 
@@ -355,7 +356,6 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
             >>> NtupleSchema.suggested_behavior("generatorWeight")
             'Weight'
         """
-        default_behavior = "NanoCollection"
         if cls.identify_closest_behavior:
             # lowercase everything to do case-insensitive matching
             behaviors = [b for b in cls.behavior() if isinstance(b, str)]
@@ -364,9 +364,9 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
                 key.lower(), behaviors_l, n=1, cutoff=cutoff
             )
             if not results:
-                return default_behavior
+                return cls.default_behavior
 
             behavior = results[0]
             # need to identify the index and return the unlowered version
             return behaviors[behaviors_l.index(behavior)]
-        return default_behavior
+        return cls.default_behavior
