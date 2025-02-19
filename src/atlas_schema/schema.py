@@ -28,7 +28,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
 
     Here, a collection refers to the top-level entry to access an item - a collection called ``el`` will be accessible under the ``el`` attributes via ``events['el']`` or ``events.el``. A subcollection called ``pt`` will be accessible under that collection, such as ``events['el']['pt']`` or ``events.el.pt``. This is the power of the schema providing a more user-friendly (and programmatic) access to the underlying branches.
 
-    The above logic means that the following branches below will be categorized as ``(collection, subcollection, systematic)`` tuples:
+    The above logic means that the following branches below will be categorized as follows:
 
     +-------------------------------+-------------------+-----------------------+------------------+
     | branch                        | collection        | subcollection         | systematic       |
