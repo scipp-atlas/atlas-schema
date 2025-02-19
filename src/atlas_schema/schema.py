@@ -314,15 +314,19 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
             output[name].setdefault("parameters", {})
             output[name]["parameters"].update({"collection_name": name})
 
-            if output[name]["class"] in ["ListOffsetArray", "NumpyArray"]:
+            if output[name]["class"] == "NumpyArray":
                 # these are singletons that we just pass through, usually
                 continue
-            if output[name]["class"] == "RecordArray":
-                parameters = output[name]["fields"]
-                contents = output[name]["contents"]
-            else:
+            if output[name]["class"] != "ListOffsetArray":
                 msg = f"Unhandled class {output[name]['class']}"
                 raise RuntimeError(msg)
+
+            if output[name]["content"]["class"] == "RecordArray":
+                parameters = output[name]["content"]["fields"]
+                contents = output[name]["content"]["contents"]
+            else:
+                continue
+
             # update docstrings as needed
             # NB: must be before flattening for easier logic
             for index, parameter in enumerate(parameters):
