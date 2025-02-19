@@ -29,6 +29,39 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
     Here, a collection refers to the top-level entry to access an item - a collection called ``el`` will be accessible under the ``el`` attributes via ``events['el']`` or ``events.el``. A subcollection called ``pt`` will be accessible under that collection, such as ``events['el']['pt']`` or ``events.el.pt``. This is the power of the schema providing a more user-friendly (and programmatic) access to the underlying branches.
 
     The above logic means that the following branches below will be categorized as ``(collection, subcollection, systematic)`` tuples:
+
+    +------------------------+------------+----------+----------+
+    | branch   | collection | subcollection | systematic |
+    +========================+============+==========+==========+
+    | body row 1, column 1   | column 2   | column 3 | column 4 |
+    +------------------------+------------+----------+----------+
+    | ``actualInteractionsPerCrossing`` | ``'actualInteractionsPerCrossing'`` |  ``None``| ``None`` |
+    +------------------------+------------+----------+----------+
+    | ``eventNumber`` | ``'eventNumber'`` | ``None`` | ``None`` |
+    +------------------------+------------+----------+----------+
+    | ``runNumber`` | ``'runNumber'`` | ``None`` |  ``None``|
+    +------------------------+------------+----------+----------+
+    | ``el_pt_NOSYS`` | ``'el'`` | ``'pt'`` | ``'NOSYS'`` |
+    +------------------------+------------+----------+----------+
+    | ``jet_cleanTightBad_NOSYS`` | ``'jet'`` | ``'cleanTightBad'`` | ``'NOSYS'`` |
+    +------------------------+------------+----------+----------+
+    | ``jet_select_btag_NOSYS`` | ``'jet'`` | ``'select_btag'`` | ``'NOSYS'`` |
+    +------------------------+------------+----------+----------+
+    | ``jet_e_NOSYS`` | ``'jet'``  | ``'e'`` | ``'NOSYS'`` |
+    +------------------------+------------+----------+----------+
+    | ``truthel_phi`` | ``'truthel'``  | ``'phi'`` | ``None`` |
+    +------------------------+------------+----------+----------+
+    | ``truthel_pt`` | ``'truthel'`` | ``'pt'`` | ``None`` |
+    +------------------------+------------+----------+----------+
+    | ``ph_eta`` | ``'ph'``  | ``'eta'`` | ``None`` |
+    +------------------------+------------+----------+----------+
+    | ``ph_phi`` | ``'ph'``  | ``'phi'``  | ``None`` |
+    +------------------------+------------+----------+----------+
+    | ``mu_TTVA_effSF_baseline_NOSYS`` | ``'mu'``  | ``'TTVA_effSF_baseline'``  | ``'NOSYS'`` |
+    +------------------------+------------+----------+----------+
+    | ``recojet_antikt4PFlow_passesOR_MUON_SAGITTA_RESBIAS__1up`` | ``'recojet'``  | ``'antikt4PFlow_passesOR'``  | ``'MUON_SAGITTA_RESBIAS__1up'`` |
+    +------------------------+------------+----------+----------+
+
       * ``actualInteractionsPerCrossing``: ``('actualInteractionsPerCrossing', None, None)``
       * ``eventNumber``: ``('eventNumber', None, None)``
       * ``runNumber``: ``('runNumber', None, None)``
