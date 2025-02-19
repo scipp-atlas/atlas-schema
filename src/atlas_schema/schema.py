@@ -317,14 +317,15 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
             if output[name]["class"] == "NumpyArray":
                 # these are singletons that we just pass through, usually
                 continue
-            if output[name]["class"] != "ListOffsetArray":
+            if output[name]["class"] not in ["RecordArray", "ListOffsetArray"]:
                 msg = f"Unhandled class {output[name]['class']}"
                 raise RuntimeError(msg)
 
             if output[name]["content"]["class"] == "RecordArray":
                 parameters = output[name]["content"]["fields"]
                 contents = output[name]["content"]["contents"]
-            else:
+            elif output[name]["content"]["class"] == "ListOffsetArray":
+                breakpoint()
                 continue
 
             # update docstrings as needed
