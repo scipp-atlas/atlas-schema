@@ -12,7 +12,9 @@
    .. rubric:: {{ _('Attributes') }}
 
    {% for item in attributes %}
+   {% if item not in inherited_members and not item.startswith('__') %}
    .. autoattribute:: {{ name }}.{{ item }}
+   {% endif %}
    {%- endfor %}
    {% endif %}
    {% endblock %}
@@ -23,7 +25,7 @@
    .. rubric:: {{ _('Methods') }}
 
    {% for item in members %}
-   {% if item not in attributes and item not in inherited_members and not item.startswith('__') and item not in ['array_type', 'array_subtype'] %}
+   {% if item not in attributes and item not in inherited_members and not item.startswith('__') %}
    .. automethod:: {{ name }}.{{ item }}
    {% endif %}
    {%- endfor %}
