@@ -81,6 +81,13 @@ intersphinx_mapping = get_intersphinx_mapping(
         "numpy",
     }
 )
+intersphinx_mapping.update(
+    {
+        "awkward": ("https://awkward-array.org/doc/main/", None),
+        "coffea": ("https://coffea-hep.readthedocs.io/en/latest/", None),
+        "dask_awkward": ("https://dask-awkward.readthedocs.io/en/stable/", None),
+    }
+)
 
 nitpick_ignore = [
     ("py:class", "_io.StringIO"),
