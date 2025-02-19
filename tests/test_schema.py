@@ -221,3 +221,31 @@ def test_underscored_mixin(event_id_fields):
         assert "recojet" not in ak.fields(events)
         assert "recojet_antikt4PFlow" in ak.fields(events)
         assert "recojet_antikt10UFO" in ak.fields(events)
+
+
+def test_undefined_singleton(event_id_fields):
+    array = {
+        **event_id_fields,
+        "singleton": ak.Array([[100], [200], [300]]),
+    }
+    src = SimplePreloadedColumnSource(array, uuid4(), 3, object_path="/Events")
+
+    with pytest.warns(
+        RuntimeWarning,
+        match=r"I identified a branch that likely does not have any leaves: 'singleton'. I will treat this as a 'singleton..*[singleton-undefined]",
+    ):
+        events = NanoEventsFactory.from_preloaded(
+            src, metadata={"dataset": "test"}, schemaclass=NtupleSchema
+        ).events()
+        assert "singleton" in ak.fields(events)
+
+    class MySchema(NtupleSchema):
+        singletons: ClassVar[set[str]] = {
+            "singleton",
+        }
+
+    events = NanoEventsFactory.from_preloaded(
+        src, metadata={"dataset": "test"}, schemaclass=MySchema
+    ).events()
+
+    assert "singleton" in ak.fields(events)
