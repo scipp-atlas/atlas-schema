@@ -96,23 +96,30 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
     __dask_capable__ = True
 
     warn_missing_crossrefs = True
+
+    #: bool: Treat missing event-level branches as error instead of warning (default: False)
     error_missing_event_ids = False
+    #: bool: Determine closest behavior for a given branch or treat branch as :attr:`NtupleSchema.default_behavior` (default: True)
     identify_closest_behavior = True
 
+    #: set[str]: event IDs to expect in data datasets
     event_ids_data: ClassVar[set[str]] = {
         "lumiBlock",
         "averageInteractionsPerCrossing",
         "actualInteractionsPerCrossing",
         "dataTakingYear",
     }
+    #: set[str]: event IDs to expect in MC datasets
     event_ids_mc: ClassVar[set[str]] = {
         "mcChannelNumber",
         "runNumber",
         "eventNumber",
         "mcEventWeights",
     }
+    #: set[str]: all event IDs to expect in the dataset
     event_ids: ClassVar[set[str]] = {*event_ids_data, *event_ids_mc}
 
+    #: dict[str, str]: mixins defining the mapping from collection name to behavior to use for that collection
     mixins: ClassVar[dict[str, str]] = {
         "el": "Electron",
         "jet": "Jet",
@@ -124,9 +131,10 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
         "weight": "Weight",
     }
 
-    # These are stored as length-1 vectors unnecessarily
+    #: set[str]: additional branches to pass-through with no zipping or additional interpretation (such as those stored as length-1 vectors)
     singletons: ClassVar[set[str]] = set()
 
+    #: dict[str, str]: docstrings to assign for specific subcollections across the various collections identified by this schema
     docstrings: ClassVar[dict[str, str]] = {
         "charge": "charge",
         "eta": "pseudorapidity",
@@ -136,7 +144,8 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
         "phi": "azimuthal angle",
     }
 
-    default_behavior = "NanoCollection"
+    #: str: default behavior to use for any collection (default: "NanoCollection", from :class:`coffea.nanoevents.methods.base.NanoCollection`)
+    default_behavior: str = "NanoCollection"
 
     def __init__(self, base_form: dict[str, Any], version: str = "latest"):
         super().__init__(base_form)
