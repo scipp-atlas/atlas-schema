@@ -93,14 +93,14 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
      Now, ``events.recojet_antikt4PFlow`` and ``events.recojet_antikt10UFO`` will be separate collections, instead of a single ``events.recojet`` that incorrectly merged branches from each of these collections.
     """
 
-    __dask_capable__ = True
+    __dask_capable__: bool = True
 
-    warn_missing_crossrefs = True
+    warn_missing_crossrefs: bool = True
 
     #: bool: Treat missing event-level branches as error instead of warning (default is ``False``)
-    error_missing_event_ids = False
+    error_missing_event_ids: bool = False
     #: bool: Determine closest behavior for a given branch or treat branch as :attr:`~atlas_schema.schema.NtupleSchema.default_behavior` (default is ``True``)
-    identify_closest_behavior = True
+    identify_closest_behavior: bool = True
 
     #: set[str]: event IDs to expect in data datasets
     event_ids_data: ClassVar[set[str]] = {
