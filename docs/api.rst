@@ -4,13 +4,14 @@ Python API
 Top-Level
 ---------
 
-.. currentmodule:: atlas_schema.schema
+.. currentmodule:: atlas_schema
 
 .. autosummary::
    :toctree: _generated/
    :nosignatures:
 
-   NtupleSchema
+   schema.NtupleSchema
+   methods
 
 Enums
 -----
