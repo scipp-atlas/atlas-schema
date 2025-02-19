@@ -21,12 +21,12 @@ def isin(element: Array, test_elements: dak.Array | ak.Array, axis: int = -1) ->
     comparison.
 
     Args:
-        element (dask_awkward.Array or awkward.Array): input array of values.
-        test_elements (dask_awkward.Array or awkward.Array): one-dimensional set of values against which to test each value of *element*.
+        element (dask_awkward.Array or ak.Array): input array of values.
+        test_elements (dask_awkward.Array or ak.Array): one-dimensional set of values against which to test each value of *element*.
         axis (int): the axis along which the comparison is performed
 
     Returns:
-        dask_awkward.Array or awkward.Array: result of comparison for test_elements in *element*
+        dask_awkward.Array or ak.Array: result of comparison for test_elements in *element*
 
     Example:
         >>> import awkward as ak
