@@ -48,51 +48,49 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
 
     **Singletons**
 
-    Sometimes you have particular branches that you don't want to be treated as a collection (with subcollections). And sometimes you will see warnings about this (see :ref:`faq`). There are some pre-defined ``singletons`` stored under :attr:`event_ids`, and these will be lazily treated as a _singleton_. For other cases where you add your own branches, you can additionally extend this class to add your own ``singletons``:
+     Sometimes you have particular branches that you don't want to be treated as a collection (with subcollections). And sometimes you will see warnings about this (see :ref:`faq`). There are some pre-defined ``singletons`` stored under :attr:`event_ids`, and these will be lazily treated as a _singleton_. For other cases where you add your own branches, you can additionally extend this class to add your own ``singletons``:
 
-    .. code-block:: python
+     .. code-block:: python
 
-       from atlas_schema.schema import NtupleSchema
+        from atlas_schema.schema import NtupleSchema
 
 
-       class MySchema(NtupleSchema):
-           singletons = {"RandomRunNumber"}
+        class MySchema(NtupleSchema):
+            singletons = {"RandomRunNumber"}
 
-    and use this schema in your analysis code. The rest of the logic will be handled for you, and you can access your singletons under ``events.RandomRunNumber`` as expected.
+     and use this schema in your analysis code. The rest of the logic will be handled for you, and you can access your singletons under ``events.RandomRunNumber`` as expected.
 
     *Mixins (collections, subcollections)**
 
-    In more complicated scenarios, you might need to teach :class:`NtupleSchema` how to handle collections that end up having underscores in their name, or other characters that make the grouping non-trivial. In some other scenarios, you want to tell the schema to assign a certain set of behaviors to a collection - rather than the default :class:`atlas_schema.methods.Particle` behavior. This is where ``mixins`` comes in. Similar to how ``singletons`` are handled, you extend this schema to include your own mixins pointing them at one of the behaviors defined in :mod:`atlas_schema.methods`.
+     In more complicated scenarios, you might need to teach :class:`NtupleSchema` how to handle collections that end up having underscores in their name, or other characters that make the grouping non-trivial. In some other scenarios, you want to tell the schema to assign a certain set of behaviors to a collection - rather than the default :class:`atlas_schema.methods.Particle` behavior. This is where ``mixins`` comes in. Similar to how ``singletons`` are handled, you extend this schema to include your own mixins pointing them at one of the behaviors defined in :mod:`atlas_schema.methods`.
 
-    Let's demonstrate both cases. Imagine you want to have your ``truthel`` collections above treated as :class:`atlas_schema.methods.Electron`, then you would extend the existing ``mixins``:
+     Let's demonstrate both cases. Imagine you want to have your ``truthel`` collections above treated as :class:`atlas_schema.methods.Electron`, then you would extend the existing ``mixins``:
 
-    .. code-block:: python
+     .. code-block:: python
 
-       from atlas_schema.schema import NtupleSchema
-
-
-       class MySchema(NtupleSchema):
-           mixins = {"truthel": "Electron", **NtupleSchema.mixins}
-
-    Now, ``events.truthel`` will give you arrays zipped up with :class:`atlas_schema.methods.Electron` behaviors.
-
-    If instead, you run into problems with mixing different branches in the same collection, because the default behavior of this schema described above is not smart enough to handle the atypical cases, you can explicitly fix this by defining your collections:
-
-    .. code-block:: python
-
-       from atlas_schema.schema import NtupleSchema
+        from atlas_schema.schema import NtupleSchema
 
 
-       class MySchema(NtupleSchema):
-           mixins = {
-               "recojet_antikt4PFlow": "Jet",
-               "recojet_antikt10UFO": "Jet",
-               **NtupleSchema.mixins,
-           }
+        class MySchema(NtupleSchema):
+            mixins = {"truthel": "Electron", **NtupleSchema.mixins}
 
-    Now, ``events.recojet_antikt4PFlow`` and ``events.recojet_antikt10UFO`` will be separate collections, instead of a single ``events.recojet`` that incorrectly merged branches from each of these collections.
+     Now, ``events.truthel`` will give you arrays zipped up with :class:`atlas_schema.methods.Electron` behaviors.
 
-    :class:`coffea.nanoevents.methods.base.NanoCollection`
+     If instead, you run into problems with mixing different branches in the same collection, because the default behavior of this schema described above is not smart enough to handle the atypical cases, you can explicitly fix this by defining your collections:
+
+     .. code-block:: python
+
+        from atlas_schema.schema import NtupleSchema
+
+
+        class MySchema(NtupleSchema):
+            mixins = {
+                "recojet_antikt4PFlow": "Jet",
+                "recojet_antikt10UFO": "Jet",
+                **NtupleSchema.mixins,
+            }
+
+     Now, ``events.recojet_antikt4PFlow`` and ``events.recojet_antikt10UFO`` will be separate collections, instead of a single ``events.recojet`` that incorrectly merged branches from each of these collections.
     """
 
     __dask_capable__ = True
@@ -101,7 +99,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
 
     #: bool: Treat missing event-level branches as error instead of warning (default is ``False``)
     error_missing_event_ids = False
-    #: bool: Determine closest behavior for a given branch or treat branch as :attr:`NtupleSchema.default_behavior` (default is ``True``)
+    #: bool: Determine closest behavior for a given branch or treat branch as :attr:`~atlas_schema.schema.NtupleSchema.default_behavior` (default is ``True``)
     identify_closest_behavior = True
 
     #: set[str]: event IDs to expect in data datasets
