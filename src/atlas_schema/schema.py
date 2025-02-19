@@ -317,17 +317,56 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
 
     @classmethod
     def behavior(cls) -> Behavior:
-        """Behaviors necessary to implement this schema"""
+        """Behaviors necessary to implement this schema
+
+        Returns:
+            dict[str | tuple['*', str], type[awkward.Record]]: an :data:`awkward.behavior` dictionary
+        """
         from atlas_schema.methods import behavior as roaster
 
         return roaster
 
-    def suggested_behavior(self, key: str, cutoff: float = 0.4) -> str:
+    @classmethod
+    def suggested_behavior(cls, key: str, cutoff: float = 0.4) -> str:
+        """
+        Suggest e behavior to use for a provided collection or branch name.
+
+        Default behavior: :class:`~coffea.nanoevents.methods.base.NanoCollection`.
+
+        Note:
+            If :attr:`NtupleSchema.identify_closest_behavior` is ``False``, then this function will return the default behavior ``NanoCollection``.
+
+        Warning:
+            If no behavior is found above the *cutoff* score, then this function will return the default behavior.
+
+        Args:
+            key (str): collection name to suggest a matching behavior for
+            cutoff (float): o ptional argument cutoff (default ``0.4``) is a float in the range ``[0, 1]``. Possibilities that don't score at least that similar to *key* are ignored.
+
+        Returns:
+            str: suggested behavior to use by string
+
+        Example:
+            >>> from atlas_schema.schema import NtupleSchema
+            >>> NtupleSchema.suggested_behavior("truthjet")
+            'Jet'
+            >>> NtupleSchema.suggested_behavior("SignalElectron")
+            'Electron'
+            >>> NtupleSchema.suggested_behavior("generatorWeight")
+            'Weight'
+        """
         default_behavior = "NanoCollection"
-        if self.identify_closest_behavior:
-            behaviors = [b for b in self.behavior() if isinstance(b, str)]
+        if cls.identify_closest_behavior:
+            # lowercase everything to do case-insensitive matching
+            behaviors = [b for b in cls.behavior() if isinstance(b, str)]
+            behaviors_l = [b.lower() for b in behaviors]
             results = difflib.get_close_matches(
-                key, [b.lower() for b in behaviors], n=1, cutoff=cutoff
-            ) or [default_behavior]
-            return results[0]
+                key.lower(), behaviors_l, n=1, cutoff=cutoff
+            )
+            if not results:
+                return default_behavior
+
+            behavior = results[0]
+            # need to identify the index and return the unlowered version
+            return behaviors[behaviors_l.index(behavior)]
         return default_behavior
