@@ -314,21 +314,18 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
             output[name].setdefault("parameters", {})
             output[name]["parameters"].update({"collection_name": name})
 
-            if output[name]["class"] == "NumpyArray":
-                # these are singletons that we just pass through, usually
-                continue
-            if output[name]["class"] not in ["RecordArray", "ListOffsetArray"]:
-                msg = f"Unhandled class {output[name]['class']}"
-                raise RuntimeError(msg)
-
-            if output[name]["class"] == "RecordArray":
-                breakpoint()
-            if output[name]["content"]["class"] == "RecordArray":
+            if output[name]["class"] == "ListOffsetArray":
                 parameters = output[name]["content"]["fields"]
                 contents = output[name]["content"]["contents"]
-            elif output[name]["content"]["class"] == "ListOffsetArray":
-                breakpoint()
+            elif output[name]["class"] == "RecordArray":
+                parameters = output[name]["fields"]
+                contents = output[name]["contents"]
+            elif output[name]["class"] == "NumpyArray":
+                # these are singletons that we just pass through
                 continue
+            else:
+                msg = f"Unhandled class {output[name]['class']}"
+                raise RuntimeError(msg)
 
             # update docstrings as needed
             # NB: must be before flattening for easier logic
