@@ -263,14 +263,6 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
 
         # next, go through and start grouping up collections
         for name in collections:
-            behavior = self.mixins.get(name, "")
-            if not behavior:
-                behavior = self.suggested_behavior(name)
-                warnings.warn(
-                    f"I found a collection with no defined mixin: '{name}'. I will assume behavior: '{behavior}'. To suppress this warning next time, please define mixins for your custom collections. [mixin-undefined]",
-                    RuntimeWarning,
-                    stacklevel=2,
-                )
             content = {}
             used = set()
 
@@ -300,7 +292,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
 
             if not used and not content:
                 warnings.warn(
-                    f"I identified a branch that likely does not have any leaves: '{name}'. I will treat this as a 'singleton'. To suppress this warning next time, please define your singletons explicitly.",
+                    f"I identified a branch that likely does not have any leaves: '{name}'. I will treat this as a 'singleton'. To suppress this warning next time, please define your singletons explicitly. [singleton-undefined]",
                     RuntimeWarning,
                     stacklevel=2,
                 )
@@ -308,14 +300,27 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
                 output[name] = branch_forms[name]
 
             else:
+                behavior = self.mixins.get(name, "")
+                if not behavior:
+                    behavior = self.suggested_behavior(name)
+                    warnings.warn(
+                        f"I found a collection with no defined mixin: '{name}'. I will assume behavior: '{behavior}'. To suppress this warning next time, please define mixins for your custom collections. [mixin-undefined]",
+                        RuntimeWarning,
+                        stacklevel=2,
+                    )
+
                 output[name] = zip_forms(content, name, record_name=behavior)
 
             output[name].setdefault("parameters", {})
             output[name]["parameters"].update({"collection_name": name})
 
             if output[name]["class"] == "ListOffsetArray":
-                parameters = output[name]["content"]["fields"]
-                contents = output[name]["content"]["contents"]
+                if output[name]["class"] == "RecordArray":
+                    parameters = output[name]["content"]["fields"]
+                    contents = output[name]["content"]["contents"]
+                else:
+                    # these are also singletons of another kind that we just pass through
+                    continue
             elif output[name]["class"] == "RecordArray":
                 parameters = output[name]["fields"]
                 contents = output[name]["contents"]
@@ -325,6 +330,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
             else:
                 msg = f"Unhandled class {output[name]['class']}"
                 raise RuntimeError(msg)
+
             # update docstrings as needed
             # NB: must be before flattening for easier logic
             for index, parameter in enumerate(parameters):
