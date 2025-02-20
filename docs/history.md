@@ -14,6 +14,25 @@ and this project adheres to
 
 **_Fixed:_**
 
+(atlas-schema-v0.2.4)=
+
+## [0.2.4](https://github.com/scipp-atlas/atlas-schema/releases/tag/v0.2.4) - 2025-02-19
+
+**_Changed:_**
+
+- Significant amount of documentation for how
+  {class}`atlas_schema.schema.NtupleSchema` works
+
+**_Added:_**
+
+- New `autosummary` templates to render improved/cleaner documentation pages
+
+**_Fixed:_**
+
+- Custom collections with underscores are now properly handled ({pr}`50`)
+- Behaviors were being checked for singletons when they should not have been
+  ({pr}`51`)
+
 (atlas-schema-v0.2.3)=
 
 ## [0.2.3](https://github.com/scipp-atlas/atlas-schema/releases/tag/v0.2.3) - 2025-02-15
