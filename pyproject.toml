@@ -154,6 +154,7 @@ module = [
   'awkward.*',
   'coffea.*',
   'dask_awkward.*',
+  'dask.sizeof.*',
 ]
 ignore_missing_imports = true
 
