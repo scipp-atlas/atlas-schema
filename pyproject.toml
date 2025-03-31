@@ -112,6 +112,7 @@ addopts = [
 xfail_strict = true
 filterwarnings = [
     "error",
+    "ignore:In version 2025.1.0 .*, this will be an error:FutureWarning",
 ]
 
 log_cli_level = "INFO"

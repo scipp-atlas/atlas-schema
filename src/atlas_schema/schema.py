@@ -190,7 +190,9 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
         branch_forms = dict(zip(field_names, input_contents))
 
         # parse into high-level records (collections, list collections, and singletons)
-        collections = {k.split("_")[0] for k in branch_forms}
+        collections = {
+            k.split("_")[0] for k in branch_forms if k not in self.singletons
+        }
         collections -= self.event_ids
         collections -= set(self.singletons)
 
@@ -227,11 +229,15 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
             branch_forms[k.replace("_NOSYS", "") + "_NOSYS"] = branch_forms.pop(k)
 
         # these are collections with systematic variations
-        subcollections = {
-            k.split("__")[0].split("_", 1)[1].replace("_NOSYS", "")
-            for k in branch_forms
-            if "NOSYS" in k
-        }
+        try:
+            subcollections = {
+                k.split("__")[0].split("_", 1)[1].replace("_NOSYS", "")
+                for k in branch_forms
+                if "NOSYS" in k and k not in self.singletons
+            }
+        except IndexError as exc:
+            msg = "One of the branches does not follow the assumed pattern for this schema. [invalid-branch-name]"
+            raise RuntimeError(msg) from exc
 
         # Check the presence of the event_ids
         missing_event_ids = [
