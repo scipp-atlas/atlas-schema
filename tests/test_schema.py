@@ -260,7 +260,7 @@ def test_singleton_branch_with_NOSYS(event_id_fields):
 
     with pytest.raises(
         RuntimeError,
-        match=r"One of the branches does not follow the assumed pattern for this schema. [invalid-branch-name]",
+        match=r"One of the branches does not follow the assumed pattern for this schema. \[invalid-branch-name\]",
     ):
         NanoEventsFactory.from_preloaded(
             src, metadata={"dataset": "test"}, schemaclass=NtupleSchema
