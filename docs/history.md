@@ -16,6 +16,18 @@ and this project adheres to
 
 (atlas-schema-v0.2.4)=
 
+## [0.2.5](https://github.com/scipp-atlas/atlas-schema/releases/tag/v0.2.5) - 2025-03-31
+
+**_Added:_**
+
+- `RuntimeWarning` when parsing a branch that does not match the structure
+  defined by the schema
+
+**_Fixed:_**
+
+- Improved handling of `singletons` {pr}`52` so we don't try to parse the branch
+  for the collection
+
 ## [0.2.4](https://github.com/scipp-atlas/atlas-schema/releases/tag/v0.2.4) - 2025-02-19
 
 **_Changed:_**
