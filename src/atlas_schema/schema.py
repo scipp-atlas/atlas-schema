@@ -190,7 +190,9 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
         branch_forms = dict(zip(field_names, input_contents))
 
         # parse into high-level records (collections, list collections, and singletons)
-        collections = {k.split("_")[0] for k in branch_forms}
+        collections = {
+            k.split("_")[0] for k in branch_forms if k not in self.singletons
+        }
         collections -= self.event_ids
         collections -= set(self.singletons)
 
@@ -230,7 +232,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
         subcollections = {
             k.split("__")[0].split("_", 1)[1].replace("_NOSYS", "")
             for k in branch_forms
-            if "NOSYS" in k
+            if "NOSYS" in k and k not in self.singletons
         }
 
         # Check the presence of the event_ids
