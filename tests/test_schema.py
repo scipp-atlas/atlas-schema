@@ -249,3 +249,22 @@ def test_undefined_singleton(event_id_fields):
     ).events()
 
     assert "singleton" in ak.fields(events)
+
+
+def test_singleton_branch_with_NOSYS(event_id_fields):
+    array = {
+        **event_id_fields,
+        "generatorWeight__NOSYS": ak.Array([[0.9], [1.1], [1.0]]),
+    }
+    src = SimplePreloadedColumnSource(array, uuid4(), 3, object_path="/Events")
+
+    class MySchema(NtupleSchema):
+        singletons: ClassVar[set[str]] = {"generatorWeight__NOSYS"}
+
+    events = NanoEventsFactory.from_preloaded(
+        src, metadata={"dataset": "test"}, schemaclass=MySchema
+    ).events()
+
+    assert len(events) == 3
+    assert events.ndim == 1
+    assert "generatorWeight__NOSYS" in ak.fields(events)
