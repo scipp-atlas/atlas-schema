@@ -34,6 +34,7 @@ def jet_array_fields():
         "jet_pt_NOSYS": ak.Array([[10.0, 15.0], [], [12.5]]),
         "jet_eta": ak.Array([[0.5, 1.8], [], [1.2]]),
         "jet_phi": ak.Array([[0.01, 1.2], [], [0.8]]),
+        "jet_m": ak.Array([[125.0, 12.0], [], [83.0]]),
     }
 
 
@@ -50,7 +51,7 @@ def test_minimum(event_id_fields, jet_array_fields):
     assert len(events) == 3
     assert events.ndim == 1
     assert events.jet.ndim == 2
-    assert set(ak.fields(events.jet)) == {"pt", "pt_syst", "eta", "phi"}
+    assert set(ak.fields(events.jet)) == {"pt", "pt_syst", "eta", "phi", "mass"}
     assert set(ak.fields(events)) == {
         "lumiBlock",
         "runNumber",
@@ -62,12 +63,12 @@ def test_minimum(event_id_fields, jet_array_fields):
         "dataTakingYear",
         "jet",
     }
-    assert set(ak.fields(events.jet)) == {"pt", "pt_syst", "eta", "phi"}
     assert set(ak.fields(events.jet.pt_syst)) == {
         "NOSYS",
     }
     assert ak.all(events.jet.pt[0] == [10, 15])
     assert ak.all(events.jet.eta[1] == [])
+    assert ak.all(events.jet.mass[2] == [83.0])
     assert isinstance(events.jet, JetArray)
     assert isinstance(events.jet[0, 0], JetRecord)
 
@@ -90,12 +91,13 @@ def test_minimum_no_event(jet_array_fields):
     assert set(ak.fields(events)) == {
         "jet",
     }
-    assert set(ak.fields(events.jet)) == {"pt", "pt_syst", "eta", "phi"}
+    assert set(ak.fields(events.jet)) == {"pt", "pt_syst", "eta", "phi", "mass"}
     assert set(ak.fields(events.jet.pt_syst)) == {
         "NOSYS",
     }
     assert ak.all(events.jet.pt[0] == [10, 15])
     assert ak.all(events.jet.eta[1] == [])
+    assert ak.all(events.jet.mass[2] == [83.0])
     assert isinstance(events.jet, JetArray)
     assert isinstance(events.jet[0, 0], JetRecord)
 
@@ -106,13 +108,14 @@ def test_easyjet_nosys_placement(event_id_fields):
         "jet_NOSYS_pt": ak.Array([[10.0, 15.0], [], [12.5]]),
         "jet_eta": ak.Array([[0.5, 1.8], [], [1.2]]),
         "jet_phi": ak.Array([[0.01, 1.2], [], [0.8]]),
+        "jet_m": ak.Array([[125.0, 12.0], [], [83.0]]),
     }
     src = SimplePreloadedColumnSource(array, uuid4(), 3, object_path="/Events")
     events = NanoEventsFactory.from_preloaded(
         src, metadata={"dataset": "test"}, schemaclass=NtupleSchema
     ).events()
 
-    assert set(ak.fields(events.jet)) == {"pt", "pt_syst", "eta", "phi"}
+    assert set(ak.fields(events.jet)) == {"pt", "pt_syst", "eta", "phi", "mass"}
     assert set(ak.fields(events.jet.pt_syst)) == {
         "NOSYS",
     }
@@ -124,6 +127,7 @@ def test_undefined_mixin(event_id_fields):
         "recojet_pt": ak.Array([[10.0, 15.0], [], [12.5]]),
         "recojet_eta": ak.Array([[0.5, 1.8], [], [1.2]]),
         "recojet_phi": ak.Array([[0.01, 1.2], [], [0.8]]),
+        "recojet_m": ak.Array([[125.0, 12.0], [], [83.0]]),
     }
     src = SimplePreloadedColumnSource(array, uuid4(), 3, object_path="/Events")
 

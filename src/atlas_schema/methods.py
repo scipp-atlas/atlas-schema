@@ -217,7 +217,7 @@ class Jet(Particle, base.NanoCollection, base.Systematic):
 
         :math:`\sqrt{t^2-x^2-y^2-z^2}`
         """
-        return self["mass"] / 1.0e3
+        return self["m"] / 1.0e3
 
 
 _set_repr_name("Jet")
