@@ -63,14 +63,6 @@ class Particle(vector.PtEtaPhiMLorentzVector):
     - '{obj}_select'
     """
 
-    @property
-    def mass(self):
-        r"""Invariant mass (+, -, -, -)
-
-        :math:`\sqrt{t^2-x^2-y^2-z^2}`
-        """
-        return self["mass"] / 1.0e3
-
     @dask_method
     def passes(self, name):
         return self[f"select_{name}"] == 1
@@ -167,7 +159,7 @@ class Electron(Particle, base.NanoCollection, base.Systematic):
     @property
     def mass(self):
         """Electron mass in GeV"""
-        return particle.literals.e_minus.mass / 1.0e3
+        return awkward.ones_like(self.pt) * particle.literals.e_minus.mass / 1.0e3
 
 
 _set_repr_name("Electron")
@@ -185,7 +177,7 @@ class Muon(Particle, base.NanoCollection, base.Systematic):
     @property
     def mass(self):
         """Muon mass in GeV"""
-        return particle.literals.mu_minus.mass / 1.0e3
+        return awkward.ones_like(self.pt) * particle.literals.mu_minus.mass / 1.0e3
 
 
 _set_repr_name("Muon")
@@ -203,7 +195,7 @@ class Tau(Particle, base.NanoCollection, base.Systematic):
     @property
     def mass(self):
         """Tau mass in GeV"""
-        return particle.literals.tau_minus.mass / 1.0e3
+        return awkward.ones_like(self.pt) * particle.literals.tau_minus.mass / 1.0e3
 
 
 _set_repr_name("Tau")
@@ -218,7 +210,14 @@ behavior.update(awkward._util.copy_behaviors("Particle", "Jet", behavior))
 
 
 @awkward.mixin_class(behavior)
-class Jet(Particle, base.NanoCollection, base.Systematic): ...
+class Jet(Particle, base.NanoCollection, base.Systematic):
+    @property
+    def mass(self):
+        r"""Invariant mass (+, -, -, -)
+
+        :math:`\sqrt{t^2-x^2-y^2-z^2}`
+        """
+        return self["mass"] / 1.0e3
 
 
 _set_repr_name("Jet")
