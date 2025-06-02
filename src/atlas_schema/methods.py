@@ -158,8 +158,8 @@ behavior.update(awkward._util.copy_behaviors("Particle", "Electron", behavior))
 class Electron(Particle, base.NanoCollection, base.Systematic):
     @property
     def mass(self):
-        """Electron mass in GeV"""
-        return awkward.ones_like(self.pt) * particle.literals.e_minus.mass / 1.0e3
+        """Electron mass in MeV"""
+        return awkward.ones_like(self.pt) * particle.literals.e_minus.mass
 
 
 _set_repr_name("Electron")
@@ -176,8 +176,8 @@ behavior.update(awkward._util.copy_behaviors("Particle", "Muon", behavior))
 class Muon(Particle, base.NanoCollection, base.Systematic):
     @property
     def mass(self):
-        """Muon mass in GeV"""
-        return awkward.ones_like(self.pt) * particle.literals.mu_minus.mass / 1.0e3
+        """Muon mass in MeV"""
+        return awkward.ones_like(self.pt) * particle.literals.mu_minus.mass
 
 
 _set_repr_name("Muon")
@@ -194,8 +194,8 @@ behavior.update(awkward._util.copy_behaviors("Particle", "Tau", behavior))
 class Tau(Particle, base.NanoCollection, base.Systematic):
     @property
     def mass(self):
-        """Tau mass in GeV"""
-        return awkward.ones_like(self.pt) * particle.literals.tau_minus.mass / 1.0e3
+        """Tau mass in MeV"""
+        return awkward.ones_like(self.pt) * particle.literals.tau_minus.mass
 
 
 _set_repr_name("Tau")
@@ -217,7 +217,7 @@ class Jet(Particle, base.NanoCollection, base.Systematic):
 
         :math:`\sqrt{t^2-x^2-y^2-z^2}`
         """
-        return self["m"] / 1.0e3
+        return self["m"]
 
 
 _set_repr_name("Jet")
