@@ -7,6 +7,7 @@ from typing import Any, ClassVar
 
 from coffea.nanoevents.schemas.base import BaseSchema, zip_forms
 
+from atlas_schema.methods import behavior as roaster
 from atlas_schema.typing_compat import Behavior, Self
 
 
@@ -360,8 +361,6 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
         Returns:
             dict[str | tuple['*', str], type[awkward.Record]]: an :data:`awkward.behavior` dictionary
         """
-        from atlas_schema.methods import behavior as roaster
-
         return roaster
 
     @classmethod
