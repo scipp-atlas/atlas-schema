@@ -76,11 +76,12 @@ def test_minimum(event_id_fields, jet_array_fields):
 def test_minimum_no_event(jet_array_fields):
     array = {**jet_array_fields}
 
+    src = SimplePreloadedColumnSource(array, uuid4(), 3, object_path="/Events")
+
     with pytest.warns(
         RuntimeWarning,
         match=r"Missing event_ids",
     ):
-        src = SimplePreloadedColumnSource(array, uuid4(), 3, object_path="/Events")
         events = NanoEventsFactory.from_preloaded(
             src, metadata={"dataset": "test"}, schemaclass=NtupleSchema
         ).events()
@@ -139,11 +140,11 @@ def test_undefined_mixin(event_id_fields):
             src, metadata={"dataset": "test"}, schemaclass=NtupleSchema
         ).events()
 
-        assert len(events) == 3
-        assert events.ndim == 1
-        assert "recojet" in ak.fields(events)
-        assert isinstance(events.recojet, JetArray)
-        assert isinstance(events.recojet[0, 0], JetRecord)
+    assert len(events) == 3
+    assert events.ndim == 1
+    assert "recojet" in ak.fields(events)
+    assert isinstance(events.recojet, JetArray)
+    assert isinstance(events.recojet[0, 0], JetRecord)
 
     with (
         pytest.warns(
@@ -156,9 +157,9 @@ def test_undefined_mixin(event_id_fields):
             src, metadata={"dataset": "test"}, schemaclass=NtupleSchema
         ).events()
 
-        assert "recojet" in ak.fields(events)
-        assert isinstance(events.recojet, NanoCollectionArray)
-        assert isinstance(events.recojet[0, 0], NanoCollection)
+    assert "recojet" in ak.fields(events)
+    assert isinstance(events.recojet, NanoCollectionArray)
+    assert isinstance(events.recojet[0, 0], NanoCollection)
 
     class MySchema(NtupleSchema):
         mixins: ClassVar[dict[str, str]] = {"recojet": "Jet", **NtupleSchema.mixins}
@@ -220,11 +221,11 @@ def test_underscored_mixin(event_id_fields):
             src, metadata={"dataset": "test"}, schemaclass=MySchema
         ).events()
 
-        assert len(events) == 3
-        assert events.ndim == 1
-        assert "recojet" not in ak.fields(events)
-        assert "recojet_antikt4PFlow" in ak.fields(events)
-        assert "recojet_antikt10UFO" in ak.fields(events)
+    assert len(events) == 3
+    assert events.ndim == 1
+    assert "recojet" not in ak.fields(events)
+    assert "recojet_antikt4PFlow" in ak.fields(events)
+    assert "recojet_antikt10UFO" in ak.fields(events)
 
 
 def test_undefined_singleton(event_id_fields):
@@ -241,7 +242,8 @@ def test_undefined_singleton(event_id_fields):
         events = NanoEventsFactory.from_preloaded(
             src, metadata={"dataset": "test"}, schemaclass=NtupleSchema
         ).events()
-        assert "singleton" in ak.fields(events)
+
+    assert "singleton" in ak.fields(events)
 
     class MySchema(NtupleSchema):
         singletons: ClassVar[set[str]] = {
