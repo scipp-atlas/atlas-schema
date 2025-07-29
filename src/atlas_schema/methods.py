@@ -8,7 +8,6 @@ from operator import ior
 import awkward
 import particle
 from coffea.nanoevents.methods import base, candidate, vector
-from dask_awkward import dask_method
 
 from atlas_schema.enums import PhotonID
 from atlas_schema.typing_compat import Behavior
@@ -63,13 +62,8 @@ class Particle(vector.PtEtaPhiMLorentzVector):
     - '{obj}_select'
     """
 
-    @dask_method
     def passes(self, name):
         return self[f"select_{name}"] == 1
-
-    @passes.dask
-    def passes(self, dask_array, name):
-        return dask_array[f"select_{name}"] == 1
 
     # NB: fields with the name 'pt' take precedence over this
     # @dask_property

@@ -1,16 +1,15 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import TypeVar, Union, cast
+from typing import TypeVar, cast
 
 import awkward as ak
-import dask_awkward as dak
 
-Array = TypeVar("Array", bound=Union[dak.Array, ak.Array])
+Array = TypeVar("Array", bound=ak.Array)
 _E = TypeVar("_E", bound=Enum)
 
 
-def isin(element: Array, test_elements: dak.Array | ak.Array, axis: int = -1) -> Array:
+def isin(element: Array, test_elements: ak.Array, axis: int = -1) -> Array:
     """
     Find test_elements in element. Similar in API as :func:`numpy.isin`.
 
@@ -21,12 +20,12 @@ def isin(element: Array, test_elements: dak.Array | ak.Array, axis: int = -1) ->
     comparison.
 
     Args:
-        element (dask_awkward.Array or ak.Array): input array of values.
-        test_elements (dask_awkward.Array or ak.Array): one-dimensional set of values against which to test each value of *element*.
+        element (ak.Array): input array of values.
+        test_elements (ak.Array): one-dimensional set of values against which to test each value of *element*.
         axis (int): the axis along which the comparison is performed
 
     Returns:
-        dask_awkward.Array or ak.Array: result of comparison for test_elements in *element*
+        ak.Array: result of comparison for test_elements in *element*
 
     Example:
         >>> import awkward as ak

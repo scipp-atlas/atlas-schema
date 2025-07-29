@@ -282,3 +282,25 @@ def test_singleton_branch_with_NOSYS(event_id_fields):
     assert len(events) == 3
     assert events.ndim == 1
     assert "generatorWeight__NOSYS" in ak.fields(events)
+
+
+def test_extra_singleton(event_id_fields):
+    array = {
+        **event_id_fields,
+    }
+    src = SimplePreloadedColumnSource(array, uuid4(), 3, object_path="/Events")
+
+    class MySchema(NtupleSchema):
+        singletons: ClassVar[set[str]] = {
+            "singleton",
+        }
+
+    with pytest.warns(
+        RuntimeWarning,
+        match=r"Missing singletons : \['singleton'\]\. \[singleton-missing\]",
+    ):
+        events = NanoEventsFactory.from_preloaded(
+            src, metadata={"dataset": "test"}, schemaclass=MySchema
+        ).events()
+
+    assert "singleton" not in ak.fields(events)
