@@ -245,6 +245,10 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
             event_id for event_id in self.event_ids if event_id not in branch_forms
         ]
 
+        missing_singletons = [
+            singleton for singleton in self.singletons if singleton not in branch_forms
+        ]
+
         if len(missing_event_ids) > 0:
             if self.error_missing_event_ids:
                 msg = f"There are missing event ID fields: {missing_event_ids} \n\n\
@@ -260,12 +264,25 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
                 stacklevel=2,
             )
 
+        if len(missing_singletons) > 0:
+            # These singletons are simply branches we do not parse or handle
+            # explicitly in atlas-schema (e.g. they are copied directly to the
+            # output structure we provide you), however there can be false
+            # positives when you submit multiple files with different branch
+            # structures and this warning could be safely ignored.
+            warnings.warn(
+                f"Missing singletons : {missing_singletons}",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+
         output = {}
 
         # first, register singletons (event-level, others)
         for name in {*self.event_ids, *self.singletons}:
-            if name in missing_event_ids:
+            if name in [*missing_event_ids, *missing_singletons]:
                 continue
+
             output[name] = branch_forms[name]
 
         # next, go through and start grouping up collections
