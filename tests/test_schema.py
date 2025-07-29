@@ -297,10 +297,10 @@ def test_extra_singleton(event_id_fields):
 
     with pytest.warns(
         RuntimeWarning,
-        match=r"Missing singletons : ['singleton'].*[singleton-missing]",
+        match=r"Missing singletons : \['singleton'\]\. \[singleton-missing\]",
     ):
         events = NanoEventsFactory.from_preloaded(
             src, metadata={"dataset": "test"}, schemaclass=MySchema
         ).events()
 
-    assert "singleton" in ak.fields(events)
+    assert "singleton" not in ak.fields(events)
