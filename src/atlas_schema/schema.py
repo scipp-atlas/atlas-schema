@@ -271,7 +271,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
             # positives when you submit multiple files with different branch
             # structures and this warning could be safely ignored.
             warnings.warn(
-                f"Missing singletons : {missing_singletons}",
+                f"Missing singletons : {missing_singletons}. [singleton-missing]",
                 RuntimeWarning,
                 stacklevel=2,
             )
