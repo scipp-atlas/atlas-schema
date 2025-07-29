@@ -1,4 +1,4 @@
-# atlas-schema v0.2.5
+# atlas-schema v0.3.0
 
 [![Actions Status][actions-badge]][actions-link]
 [![Documentation Status][rtd-badge]][rtd-link]
