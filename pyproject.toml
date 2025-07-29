@@ -28,7 +28,7 @@ classifiers = [
   "Typing :: Typed",
 ]
 dynamic = ["version"]
-dependencies = ["coffea[dask] >= 2024.4.1", "particle >= 0.25.0"]
+dependencies = ["coffea[dask] >= 2025.7.0", "particle >= 0.25.0"]
 
 [project.optional-dependencies]
 test = [
