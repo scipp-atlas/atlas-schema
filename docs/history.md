@@ -14,7 +14,17 @@ and this project adheres to
 
 **_Fixed:_**
 
-(atlas-schema-v0.2.4)=
+(atlas-schema-v0.3.0)=
+
+## [0.3.0](https://github.com/scipp-atlas/atlas-schema/releases/tag/v0.3.0) - 2025-07-29
+
+**_Changed:_**
+
+- `dask_awkward` code has been dropped {pr}`65`
+- updated `README` and examples to use the new `coffea.processor` interface
+- `coffea` dependency bumped up to `2025.7.x+`
+
+(atlas-schema-v0.2.5)=
 
 ## [0.2.5](https://github.com/scipp-atlas/atlas-schema/releases/tag/v0.2.5) - 2025-03-31
 
@@ -27,6 +37,8 @@ and this project adheres to
 
 - Improved handling of `singletons` {pr}`52` so we don't try to parse the branch
   for the collection
+
+(atlas-schema-v0.2.4)=
 
 ## [0.2.4](https://github.com/scipp-atlas/atlas-schema/releases/tag/v0.2.4) - 2025-02-19
 
