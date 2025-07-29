@@ -82,11 +82,9 @@ like below:
 
 ```python
 import awkward as ak
-import dask
-import hist.dask as had
+from hist import Hist
 import matplotlib.pyplot as plt
 from coffea import processor
-from coffea.nanoevents import NanoEventsFactory
 from distributed import Client
 
 from atlas_schema.schema import NtupleSchema
@@ -99,7 +97,7 @@ class MyFirstProcessor(processor.ProcessorABC):
     def process(self, events):
         dataset = events.metadata["dataset"]
         h_ph_pt = (
-            had.Hist.new.StrCat(["all", "pass", "fail"], name="isEM")
+            Hist.new.StrCat(["all", "pass", "fail"], name="isEM")
             .Regular(200, 0.0, 2000.0, name="pt", label="$pt_{\gamma}$ [GeV]")
             .Int64()
         )
@@ -123,17 +121,18 @@ class MyFirstProcessor(processor.ProcessorABC):
 if __name__ == "__main__":
     client = Client()
 
-    fname = "ntuple.root"
-    events = NanoEventsFactory.from_root(
-        {fname: "analysis"},
-        schemaclass=NtupleSchema,
-        metadata={"dataset": "700352.Zqqgamma.mc20d.v1"},
-    ).events()
+    fileset = {"700352.Zqqgamma.mc20d.v1": {"files": {"ntuple.root": "analysis"}}}
 
-    p = MyFirstProcessor()
-    out = p.process(events)
-    (computed,) = dask.compute(out)
-    print(computed)
+    run = processor.Runner(
+        executor=processor.IterativeExecutor(compression=None),
+        schema=NtupleSchema,
+        savemetrics=True,
+    )
+
+    out, metrics = run(fileset, processor_instance=MyFirstProcessor())
+
+    print(out)
+    print(metrics)
 
     fig, ax = plt.subplots()
     computed["700352.Zqqgamma.mc20d.v1"]["ph_pt"].plot1d(ax=ax)
