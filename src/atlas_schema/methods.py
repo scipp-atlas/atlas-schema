@@ -18,22 +18,89 @@ behavior.update(base.behavior)
 behavior.update(candidate.behavior)
 
 
-class NtupleEvents(behavior["NanoEvents"]):  # type: ignore[misc, valid-type, name-defined]
-    def __repr__(self):
-        return f"<event {getattr(self, 'runNumber', '??')}:\
-                {getattr(self, 'eventNumber', '??')}:\
-                {getattr(self, 'mcChannelNumber', '??')}>"
-
-
-behavior["NanoEvents"] = NtupleEvents
-
-
 def _set_repr_name(classname):
     def namefcn(_self):
         return classname
 
     behavior[("__typestr__", classname)] = classname[0].lower() + classname[1:]
     behavior[classname].__repr__ = namefcn
+
+
+class NtupleEvents(behavior["NanoEvents"]):  # type: ignore[misc, valid-type, name-defined]
+    """Individual systematic variation of events."""
+
+    def __repr__(self):
+        return f"<event {getattr(self, 'runNumber', '??')}:{getattr(self, 'eventNumber', '??')}:{getattr(self, 'mcChannelNumber', '??')}>"
+
+    @property
+    def systematic(self):
+        """Get the systematic variation name for this event collection."""
+        return "nominal"
+
+    @property
+    def systematic_names(self):
+        """Get all systematic variations available in this event collection.
+
+        Returns a list of systematic variation names, excluding 'nominal'.
+        """
+        # Get systematics from metadata stored during schema building
+        return self.metadata.get("systematics", [])
+
+    @property
+    def systematics(self):
+        """Get all systematic variations available in this event collection.
+
+        Returns a list of systematic variation names, excluding 'nominal'.
+        """
+        # Get systematics from metadata stored during schema building
+        return [getattr(self, systematic) for systematic in self.systematic_names]
+
+
+behavior["NtupleEvents"] = NtupleEvents
+
+
+class NtupleEventsArray(behavior[("*", "NanoEvents")]):  # type: ignore[misc, valid-type, name-defined]
+    """Collection of NtupleEvents objects, one for each systematic variation."""
+
+    @property
+    def systematic_names(self):
+        """Get all systematic variations available in this event collection.
+
+        Returns a list of systematic variation names, excluding 'nominal'.
+        """
+        # Get systematics from metadata stored during schema building
+        return self.metadata.get("systematics", [])
+
+    @property
+    def systematics(self):
+        """Get all systematic variations available in this event collection.
+
+        Returns a list of systematic variation names, excluding 'nominal'.
+        """
+        # Get systematics from metadata stored during schema building
+        return [getattr(self, systematic) for systematic in self.systematic_names]
+
+
+behavior[("*", "NtupleEvents")] = NtupleEventsArray
+
+
+@awkward.mixin_class(behavior)
+class Systematic(base.NanoCollection, base.Systematic):
+    @property
+    def metadata(self):
+        """Arbitrary metadata"""
+        return self.layout.purelist_parameter("metadata")
+
+    @property
+    def systematic(self):
+        """Get the systematic variation name for this event collection."""
+        return self.metadata["systematic"]
+
+    def __repr__(self):
+        return f"<event {self.systematic}>"
+
+
+_set_repr_name("Systematic")
 
 
 @awkward.mixin_class(behavior)
