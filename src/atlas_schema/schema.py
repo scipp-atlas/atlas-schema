@@ -242,7 +242,10 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
             msg = "One of the branches does not follow the assumed pattern for this schema. [invalid-branch-name]"
             raise RuntimeError(msg) from exc
 
-        # discover all systematic variations across all branches
+        # Optimize systematic discovery: pre-index branches by pattern
+        # This avoids O(n*m) nested loops in systematic discovery
+        subcoll_patterns = {f"{subcoll}_" for subcoll in subcollections}
+
         all_systematics = set()
         for k in branch_forms:
             if "_" in k and k not in self.singletons:
@@ -256,15 +259,25 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
                         # Find where the subcollection ends by looking for a known pattern
                         # The systematic starts after the subcollection
                         remaining = "_".join(parts[1:])
-                        for subcoll in subcollections:
-                            if remaining.startswith(f"{subcoll}_"):
-                                systematic = remaining[len(subcoll) + 1 :]
+                        # Use optimized lookup instead of iterating all subcollections
+                        for pattern in subcoll_patterns:
+                            if remaining.startswith(pattern):
+                                systematic = remaining[len(pattern) :]
                                 if systematic and systematic != "NOSYS":
                                     all_systematics.add(systematic)
                                 break
 
         # Always include NOSYS as the nominal case
         all_systematics.add("NOSYS")
+
+        # Pre-compute systematic branch patterns for O(1) lookups
+        # This replaces the expensive O(m*s) nested condition checks
+        systematic_branch_patterns = set()
+        for collection in collections:
+            for subcoll in subcollections:
+                for sys in all_systematics:
+                    if sys != "NOSYS":
+                        systematic_branch_patterns.add(f"{collection}_{subcoll}_{sys}")
 
         # Check the presence of the event_ids
         missing_event_ids = [
@@ -332,7 +345,8 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
                     k.startswith(collection_name + "_")
                     and k not in used
                     and "_NOSYS" not in k
-                    and not any(sys in k for sys in subcollections)
+                    and k
+                    not in systematic_branch_patterns  # O(1) lookup instead of O(m*s)
                 ):
                     field_name = k[len(collection_name) + 1 :]
                     if field_name not in collection_content:
@@ -394,7 +408,8 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
                         k.startswith(collection_name + "_")
                         and k not in used
                         and "_NOSYS" not in k
-                        and not any(sys in k for sys in subcollections)
+                        and k
+                        not in systematic_branch_patterns  # O(1) lookup instead of O(m*s)
                     ):
                         field_name = k[len(collection_name) + 1 :]
                         if field_name not in collection_content:
