@@ -242,33 +242,9 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
             msg = "One of the branches does not follow the assumed pattern for this schema. [invalid-branch-name]"
             raise RuntimeError(msg) from exc
 
-        # Optimize systematic discovery: pre-index branches by pattern
-        # This avoids O(n*m) nested loops in systematic discovery
-        subcoll_patterns = {f"{subcoll}_" for subcoll in subcollections}
-
-        all_systematics = set()
-        for k in branch_forms:
-            if "_" in k and k not in self.singletons:
-                # Handle the pattern: collection_subcollection_systematic
-                # where systematic can contain double underscores like "JET_EnergyResolution__1up"
-                parts = k.split("_")
-                if len(parts) >= 3:
-                    # Find the collection and subcollection parts
-                    collection = parts[0]
-                    if collection in collections:
-                        # Find where the subcollection ends by looking for a known pattern
-                        # The systematic starts after the subcollection
-                        remaining = "_".join(parts[1:])
-                        # Use optimized lookup instead of iterating all subcollections
-                        for pattern in subcoll_patterns:
-                            if remaining.startswith(pattern):
-                                systematic = remaining[len(pattern) :]
-                                if systematic and systematic != "NOSYS":
-                                    all_systematics.add(systematic)
-                                break
-
-        # Always include NOSYS as the nominal case
-        all_systematics.add("NOSYS")
+        all_systematics = self._discover_systematics(
+            branch_forms, collections, subcollections
+        )
 
         # Pre-compute systematic branch patterns for O(1) lookups
         # This replaces the expensive O(m*s) nested condition checks
@@ -481,6 +457,49 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
         discovered_systematics = sorted([s for s in all_systematics if s != "NOSYS"])
 
         return output.keys(), output.values(), discovered_systematics
+
+    def _discover_systematics(
+        self,
+        branch_forms: dict[str, Any],
+        collections: set[str],
+        subcollections: set[str],
+    ) -> set[str]:
+        """Extract systematic variations from branch names.
+
+        Returns:
+            set: Set of all systematic variation names found in branches
+        """
+        # Optimize systematic discovery: pre-index branches by pattern
+        # This avoids O(n*m) nested loops in systematic discovery
+        subcoll_patterns = {f"{subcoll}_" for subcoll in subcollections}
+
+        all_systematics = set()
+        for k in branch_forms:
+            if not ("_" in k and k not in self.singletons):
+                continue
+            # Handle the pattern: collection_subcollection_systematic
+            # where systematic can contain double underscores like "JET_EnergyResolution__1up"
+            parts = k.split("_")
+            if len(parts) < 3:
+                continue
+            # Find the collection and subcollection parts
+            collection = parts[0]
+            if collection not in collections:
+                continue
+            # Find where the subcollection ends by looking for a known pattern
+            # The systematic starts after the subcollection
+            remaining = "_".join(parts[1:])
+            # Use optimized lookup instead of iterating all subcollections
+            for pattern in subcoll_patterns:
+                if remaining.startswith(pattern):
+                    systematic = remaining[len(pattern) :]
+                    if systematic and systematic != "NOSYS":
+                        all_systematics.add(systematic)
+                    break
+
+        # Always include NOSYS as the nominal case
+        all_systematics.add("NOSYS")
+        return all_systematics
 
     @classmethod
     def behavior(cls) -> Behavior:
