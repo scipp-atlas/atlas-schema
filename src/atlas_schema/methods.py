@@ -67,7 +67,11 @@ class NtupleEvents(behavior["NanoEvents"]):  # type: ignore[misc, valid-type, na
         Returns a list of systematic variation names, excluding 'nominal'.
         """
         # Get systematics from metadata stored during schema building
-        return [getattr(self, systematic) for systematic in self.systematic_names]
+        return [
+            getattr(self, systematic)
+            for systematic in self.systematic_names
+            if systematic != "NOSYS"
+        ]
 
 
 behavior["NtupleEvents"] = NtupleEvents
@@ -106,7 +110,11 @@ class NtupleEventsArray(behavior[("*", "NanoEvents")]):  # type: ignore[misc, va
         Returns a list of systematic variation names, excluding 'nominal'.
         """
         # Get systematics from metadata stored during schema building
-        return [getattr(self, systematic) for systematic in self.systematic_names]
+        return [
+            getattr(self, systematic)
+            for systematic in self.systematic_names
+            if systematic != "NOSYS"
+        ]
 
 
 behavior[("*", "NtupleEvents")] = NtupleEventsArray
@@ -129,57 +137,19 @@ class Systematic(base.NanoCollection, base.Systematic):
     def __repr__(self):
         return f"<event {self.systematic}>"
 
-    def _build_variations(self, _name, what, varying_function):
-        """Build systematic variations - base implementation."""
-        return varying_function(self, what)
-
-    def describe_variations(self):
-        """Return list of variation names."""
-        return []
-
-    def explodes_how(self):
-        """Describe how systematic uncertainty should be evaluated."""
-        return "independent"
-
 
 _set_repr_name("Systematic")
 
 
 @awkward.mixin_class(behavior)
-class Weight(base.NanoCollection, base.Systematic):
-    """Weight systematic variation."""
-
-    def _build_variations(self, _name, what, varying_function):
-        """Build weight variations."""
-        return varying_function(self, what)
-
-    def describe_variations(self):
-        """Return list of weight variation names."""
-        return []
-
-    def explodes_how(self):
-        """Weight variations are independent."""
-        return "independent"
+class Weight(base.NanoCollection, base.Systematic): ...
 
 
 _set_repr_name("Weight")
 
 
 @awkward.mixin_class(behavior)
-class Pass(base.NanoCollection, base.Systematic):
-    """Pass systematic variation."""
-
-    def _build_variations(self, _name, what, varying_function):
-        """Build pass variations."""
-        return varying_function(self, what)
-
-    def describe_variations(self):
-        """Return list of pass variation names."""
-        return []
-
-    def explodes_how(self):
-        """Pass variations are independent."""
-        return "independent"
+class Pass(base.NanoCollection, base.Systematic): ...
 
 
 _set_repr_name("Pass")
@@ -241,18 +211,6 @@ class MissingET(vector.PolarTwoVector, base.NanoCollection, base.Systematic):
         """Distance from origin in XY plane"""
         return self["met"]
 
-    def _build_variations(self, _name, what, varying_function):
-        """Build MET variations."""
-        return varying_function(self, what)
-
-    def describe_variations(self):
-        """Return list of MET variation names."""
-        return []
-
-    def explodes_how(self):
-        """MET variations are independent."""
-        return "independent"
-
 
 _set_repr_name("MissingET")
 
@@ -288,18 +246,6 @@ class Photon(Particle, base.NanoCollection, base.Systematic):
             self.isEM_syst.NOSYS & reduce(ior, (1 << word.value for word in words))  # pylint: disable=no-member
         ) == 0
 
-    def _build_variations(self, _name, what, varying_function):
-        """Build photon variations."""
-        return varying_function(self, what)
-
-    def describe_variations(self):
-        """Return list of photon variation names."""
-        return []
-
-    def explodes_how(self):
-        """Photon variations are independent."""
-        return "independent"
-
 
 _set_repr_name("Photon")
 
@@ -319,18 +265,6 @@ class Electron(Particle, base.NanoCollection, base.Systematic):
     def mass(self):
         """Electron mass in MeV"""
         return awkward.ones_like(self.pt) * particle.literals.e_minus.mass  # pylint: disable=no-member
-
-    def _build_variations(self, _name, what, varying_function):
-        """Build electron variations."""
-        return varying_function(self, what)
-
-    def describe_variations(self):
-        """Return list of electron variation names."""
-        return []
-
-    def explodes_how(self):
-        """Electron variations are independent."""
-        return "independent"
 
 
 _set_repr_name("Electron")
@@ -352,18 +286,6 @@ class Muon(Particle, base.NanoCollection, base.Systematic):
         """Muon mass in MeV"""
         return awkward.ones_like(self.pt) * particle.literals.mu_minus.mass  # pylint: disable=no-member
 
-    def _build_variations(self, _name, what, varying_function):
-        """Build muon variations."""
-        return varying_function(self, what)
-
-    def describe_variations(self):
-        """Return list of muon variation names."""
-        return []
-
-    def explodes_how(self):
-        """Muon variations are independent."""
-        return "independent"
-
 
 _set_repr_name("Muon")
 
@@ -383,18 +305,6 @@ class Tau(Particle, base.NanoCollection, base.Systematic):
     def mass(self):
         """Tau mass in MeV"""
         return awkward.ones_like(self.pt) * particle.literals.tau_minus.mass  # pylint: disable=no-member
-
-    def _build_variations(self, _name, what, varying_function):
-        """Build tau variations."""
-        return varying_function(self, what)
-
-    def describe_variations(self):
-        """Return list of tau variation names."""
-        return []
-
-    def explodes_how(self):
-        """Tau variations are independent."""
-        return "independent"
 
 
 _set_repr_name("Tau")
@@ -419,18 +329,6 @@ class Jet(Particle, base.NanoCollection, base.Systematic):
         :math:`\sqrt{t^2-x^2-y^2-z^2}`
         """
         return self["m"]
-
-    def _build_variations(self, _name, what, varying_function):
-        """Build jet variations."""
-        return varying_function(self, what)
-
-    def describe_variations(self):
-        """Return list of jet variation names."""
-        return []
-
-    def explodes_how(self):
-        """Jet variations are independent."""
-        return "independent"
 
 
 _set_repr_name("Jet")
