@@ -260,3 +260,62 @@ def test_nosys_getitem_fallback(event_id_fields, systematic_variation_fields):
     # Test accessing an invalid key to ensure super().__getitem__ is called
     with pytest.raises(ak.errors.FieldNotFoundError):
         _ = events["nonexistent_systematic"]
+
+
+def test_systematic_properties(event_id_fields, systematic_variation_fields):
+    """Test systematic-related properties."""
+    array = {**event_id_fields, **systematic_variation_fields}
+    src = SimplePreloadedColumnSource(array, uuid4(), 3, object_path="/Events")
+    events = NanoEventsFactory.from_preloaded(
+        src, metadata={"dataset": "test_properties"}, schemaclass=NtupleSchema
+    ).events()
+
+    # Test nominal events properties (test on individual event, not array)
+    single_event = events[0]
+    assert single_event.systematic == "nominal", (
+        "Nominal events should have systematic='nominal'"
+    )
+
+    # Test systematic_names includes NOSYS and other variations
+    systematic_names = events.systematic_names
+    assert "NOSYS" in systematic_names, "systematic_names should include NOSYS"
+    assert "JET_EnergyResolution__1up" in systematic_names, (
+        "systematic_names should include JET systematic"
+    )
+    assert "EG_RESOLUTION_ALL__1up" in systematic_names, (
+        "systematic_names should include EG systematic"
+    )
+
+    # Test systematics property returns systematic event objects
+    systematics = events.systematics
+    assert len(systematics) == len(systematic_names) - 1, (
+        "systematics should exclude NOSYS"
+    )
+
+    # Test systematic variation properties
+    jet_syst = events["JET_EnergyResolution__1up"]
+    assert jet_syst.systematic == "JET_EnergyResolution__1up", (
+        "Systematic should have correct name"
+    )
+
+
+def test_repr_methods(event_id_fields, systematic_variation_fields):
+    """Test __repr__ methods for events and systematic variations."""
+    array = {**event_id_fields, **systematic_variation_fields}
+    src = SimplePreloadedColumnSource(array, uuid4(), 3, object_path="/Events")
+    events = NanoEventsFactory.from_preloaded(
+        src, metadata={"dataset": "test_repr"}, schemaclass=NtupleSchema
+    ).events()
+
+    # Test nominal events repr
+    events_repr = repr(events[0])  # Get first event
+    assert "event" in events_repr, "Events repr should contain 'event'"
+    assert "654321" in events_repr, "Events repr should contain runNumber"
+    assert "123456789" in events_repr, "Events repr should contain eventNumber"
+
+    # Test systematic variation repr
+    jet_syst = events["JET_EnergyResolution__1up"]
+    syst_repr = repr(jet_syst)
+    assert "event JET_EnergyResolution__1up" in syst_repr, (
+        "Systematic repr should contain systematic name"
+    )
