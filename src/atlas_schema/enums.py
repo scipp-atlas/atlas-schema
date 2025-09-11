@@ -18,7 +18,7 @@ class MultipleEnumAccessMeta(EnumType):
     Enum Metaclass to provide a way to access multiple values all at once.
     """
 
-    def __getitem__(self: type[_E], key: str | tuple[str]) -> _E | list[_E]:  # type:ignore[misc,override]
+    def __getitem__(cls: type[_E], key: str | tuple[str]) -> _E | list[_E]:  # type:ignore[misc,override]
         getitem = cast(Callable[[str], _E], super().__getitem__)  # type:ignore[misc]
         if isinstance(key, tuple):
             return [getitem(name) for name in key]

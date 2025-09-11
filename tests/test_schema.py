@@ -51,7 +51,7 @@ def test_minimum(event_id_fields, jet_array_fields):
     assert len(events) == 3
     assert events.ndim == 1
     assert events.jet.ndim == 2
-    assert set(ak.fields(events.jet)) == {"pt", "pt_syst", "eta", "phi", "m"}
+    assert set(ak.fields(events.jet)) == {"pt", "eta", "phi", "m"}
     assert set(ak.fields(events)) == {
         "lumiBlock",
         "runNumber",
@@ -63,9 +63,8 @@ def test_minimum(event_id_fields, jet_array_fields):
         "dataTakingYear",
         "jet",
     }
-    assert set(ak.fields(events.jet.pt_syst)) == {
-        "NOSYS",
-    }
+    # New systematic interface - no pt_syst fields
+    # Systematic access is now via events.SYSTEMATIC_NAME.collection.field
     assert ak.all(events.jet.pt[0] == [10, 15])
     assert ak.all(events.jet.eta[1] == [])
     assert ak.all(events.jet.mass[2] == [83.0])
@@ -92,10 +91,9 @@ def test_minimum_no_event(jet_array_fields):
     assert set(ak.fields(events)) == {
         "jet",
     }
-    assert set(ak.fields(events.jet)) == {"pt", "pt_syst", "eta", "phi", "m"}
-    assert set(ak.fields(events.jet.pt_syst)) == {
-        "NOSYS",
-    }
+    assert set(ak.fields(events.jet)) == {"pt", "eta", "phi", "m"}
+    # New systematic interface - no pt_syst fields
+    # Systematic access is now via events.SYSTEMATIC_NAME.collection.field
     assert ak.all(events.jet.pt[0] == [10, 15])
     assert ak.all(events.jet.eta[1] == [])
     assert ak.all(events.jet.mass[2] == [83.0])
@@ -116,10 +114,9 @@ def test_easyjet_nosys_placement(event_id_fields):
         src, metadata={"dataset": "test"}, schemaclass=NtupleSchema
     ).events()
 
-    assert set(ak.fields(events.jet)) == {"pt", "pt_syst", "eta", "phi", "m"}
-    assert set(ak.fields(events.jet.pt_syst)) == {
-        "NOSYS",
-    }
+    assert set(ak.fields(events.jet)) == {"pt", "eta", "phi", "m"}
+    # New systematic interface - no pt_syst fields
+    # Systematic access is now via events.SYSTEMATIC_NAME.collection.field
 
 
 def test_undefined_mixin(event_id_fields):

@@ -171,10 +171,12 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
             pass
         else:
             pass
-        self._form["fields"], self._form["contents"] = self._build_collections(
-            self._form["fields"], self._form["contents"]
+        self._form["fields"], self._form["contents"], discovered_systematics = (
+            self._build_collections(self._form["fields"], self._form["contents"])
         )
         self._form["parameters"]["metadata"]["version"] = self._version
+        self._form["parameters"]["metadata"]["systematics"] = discovered_systematics
+        self._form["parameters"]["__record__"] = "NtupleEvents"
 
     @classmethod
     def v1(cls, base_form: dict[str, Any]) -> Self:
@@ -187,7 +189,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
 
     def _build_collections(
         self, field_names: list[str], input_contents: list[Any]
-    ) -> tuple[KeysView[str], ValuesView[dict[str, Any]]]:
+    ) -> tuple[KeysView[str], ValuesView[dict[str, Any]], list[str]]:
         branch_forms = dict(zip(field_names, input_contents))
 
         # parse into high-level records (collections, list collections, and singletons)
@@ -240,6 +242,19 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
             msg = "One of the branches does not follow the assumed pattern for this schema. [invalid-branch-name]"
             raise RuntimeError(msg) from exc
 
+        all_systematics = self._discover_systematics(
+            branch_forms, collections, subcollections
+        )
+
+        # Pre-compute systematic branch patterns for O(1) lookups
+        # This replaces the expensive O(m*s) nested condition checks
+        systematic_branch_patterns = set()
+        for collection in collections:
+            for subcoll in subcollections:
+                for sys in all_systematics:
+                    if sys != "NOSYS":
+                        systematic_branch_patterns.add(f"{collection}_{subcoll}_{sys}")
+
         # Check the presence of the event_ids
         missing_event_ids = [
             event_id for event_id in self.event_ids if event_id not in branch_forms
@@ -285,91 +300,206 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
 
             output[name] = branch_forms[name]
 
-        # next, go through and start grouping up collections
-        for name in collections:
-            content = {}
+        # First, build nominal collections the traditional way
+        nominal_collections = {}
+        for collection_name in collections:
+            collection_content = {}
             used = set()
 
+            # Process subcollections with NOSYS variations
             for subname in subcollections:
-                prefix = f"{name}_{subname}_"
-                used.update({k for k in branch_forms if k.startswith(prefix)})
-                subcontent = {
-                    k[len(prefix) :]: branch_forms[k]
-                    for k in branch_forms
-                    if k.startswith(prefix)
-                }
-                if subcontent:
-                    # create the nominal version
-                    content[subname] = branch_forms[f"{prefix}NOSYS"]
-                    # create a collection of the systematic variations for the given variable
-                    content[f"{subname}_syst"] = zip_forms(
-                        subcontent, f"{name}_syst", record_name="NanoCollection"
-                    )
+                prefix = f"{collection_name}_{subname}_"
+                nosys_branch = f"{prefix}NOSYS"
 
-            content.update(
-                {
-                    k[len(name) + 1 :]: branch_forms[k]
-                    for k in branch_forms
-                    if k.startswith(name + "_") and k not in used
-                }
-            )
+                if nosys_branch in branch_forms:
+                    collection_content[subname] = branch_forms[nosys_branch]
+                    used.add(nosys_branch)
 
-            if not used and not content:
-                warnings.warn(
-                    f"I identified a branch that likely does not have any leaves: '{name}'. I will treat this as a 'singleton'. To suppress this warning next time, please define your singletons explicitly. [singleton-undefined]",
-                    RuntimeWarning,
-                    stacklevel=2,
-                )
-                self.singletons.add(name)
-                output[name] = branch_forms[name]
+            # Add non-systematic branches (like eta, phi that don't vary)
+            for k, form in branch_forms.items():
+                if (
+                    k.startswith(collection_name + "_")
+                    and k not in used
+                    and "_NOSYS" not in k
+                    and k
+                    not in systematic_branch_patterns  # O(1) lookup instead of O(m*s)
+                ):
+                    field_name = k[len(collection_name) + 1 :]
+                    if field_name not in collection_content:
+                        collection_content[field_name] = form
 
-            else:
-                behavior = self.mixins.get(name, "")
+            if collection_content:
+                behavior = self.mixins.get(collection_name, "")
                 if not behavior:
-                    behavior = self.suggested_behavior(name)
+                    behavior = self.suggested_behavior(collection_name)
                     warnings.warn(
-                        f"I found a collection with no defined mixin: '{name}'. I will assume behavior: '{behavior}'. To suppress this warning next time, please define mixins for your custom collections. [mixin-undefined]",
+                        f"I found a collection with no defined mixin: '{collection_name}'. I will assume behavior: '{behavior}'. To suppress this warning next time, please define mixins for your custom collections. [mixin-undefined]",
                         RuntimeWarning,
                         stacklevel=2,
                     )
-
-                output[name] = zip_forms(content, name, record_name=behavior)
-
-            output[name].setdefault("parameters", {})
-            output[name]["parameters"].update({"collection_name": name})
-
-            if output[name]["class"] == "ListOffsetArray":
-                if output[name]["class"] == "RecordArray":
-                    parameters = output[name]["content"]["fields"]
-                    contents = output[name]["content"]["contents"]
-                else:
-                    # these are also singletons of another kind that we just pass through
-                    continue
-            elif output[name]["class"] == "RecordArray":
-                parameters = output[name]["fields"]
-                contents = output[name]["contents"]
-            elif output[name]["class"] == "NumpyArray":
-                # these are singletons that we just pass through
-                continue
-            else:
-                msg = f"Unhandled class {output[name]['class']}"
-                raise RuntimeError(msg)
-
-            # update docstrings as needed
-            # NB: must be before flattening for easier logic
-            for index, parameter in enumerate(parameters):
-                if "parameters" not in contents[index]:
-                    continue
-
-                parsed_name = parameter.replace("_NOSYS", "")
-                contents[index]["parameters"]["__doc__"] = self.docstrings.get(
-                    parsed_name,
-                    contents[index]["parameters"].get(
-                        "__doc__", "no docstring available"
-                    ),
+                nominal_collections[collection_name] = zip_forms(
+                    collection_content, collection_name, record_name=behavior
+                )
+                nominal_collections[collection_name].setdefault("parameters", {})
+                nominal_collections[collection_name]["parameters"].update(
+                    {"collection_name": collection_name}
                 )
 
-        return output.keys(), output.values()
+        # Add nominal collections to output
+        output.update(nominal_collections)
+
+        # Now build systematic event structures
+        for systematic in all_systematics:
+            if systematic == "NOSYS":
+                continue
+
+            # Check which collections actually have this systematic variation
+            systematic_collections = {}
+
+            for collection_name in collections:
+                # Check if this collection has any systematic branches for this systematic
+                has_systematic_data = False
+                collection_content = {}
+                used = set()
+
+                # Process subcollections with systematic variations
+                for subname in subcollections:
+                    prefix = f"{collection_name}_{subname}_"
+                    target_branch = f"{prefix}{systematic}"
+                    fallback_branch = f"{prefix}NOSYS"
+
+                    if target_branch in branch_forms:
+                        # Use the systematic variation
+                        collection_content[subname] = branch_forms[target_branch]
+                        used.add(target_branch)
+                        has_systematic_data = True
+                    elif fallback_branch in branch_forms:
+                        # Fall back to nominal
+                        collection_content[subname] = branch_forms[fallback_branch]
+                        used.add(fallback_branch)
+
+                # Add non-systematic branches
+                for k, form in branch_forms.items():
+                    if (
+                        k.startswith(collection_name + "_")
+                        and k not in used
+                        and "_NOSYS" not in k
+                        and k
+                        not in systematic_branch_patterns  # O(1) lookup instead of O(m*s)
+                    ):
+                        field_name = k[len(collection_name) + 1 :]
+                        if field_name not in collection_content:
+                            collection_content[field_name] = form
+
+                # If this collection has systematic data or fallback data, include it
+                if collection_content:
+                    behavior = self.mixins.get(collection_name, "")
+                    if not behavior:
+                        behavior = self.suggested_behavior(collection_name)
+                        # Only warn once (for nominal collections)
+
+                    # If no systematic data, use the nominal collection directly
+                    if (
+                        not has_systematic_data
+                        and collection_name in nominal_collections
+                    ):
+                        systematic_collections[collection_name] = nominal_collections[
+                            collection_name
+                        ]
+                    else:
+                        # Build the systematic collection
+                        systematic_collections[collection_name] = zip_forms(
+                            collection_content, collection_name, record_name=behavior
+                        )
+                        systematic_collections[collection_name].setdefault(
+                            "parameters", {}
+                        )
+                        systematic_collections[collection_name]["parameters"].update(
+                            {"collection_name": collection_name}
+                        )
+
+            # Only create systematic event if there are collections for it
+            if systematic_collections:
+                output[systematic] = {
+                    "class": "RecordArray",
+                    "contents": list(systematic_collections.values()),
+                    "fields": list(systematic_collections.keys()),
+                    "form_key": f"%21invalid%2C{systematic}",
+                    "parameters": {
+                        "__record__": "Systematic",
+                        "metadata": {"systematic": systematic},
+                    },
+                }
+
+        # Handle any remaining unrecognized branches as singletons
+        processed_branches = set()
+        # Add event IDs and explicit singletons
+        processed_branches.update(self.event_ids)
+        processed_branches.update(self.singletons)
+        # Add collection-related branches
+        for collection_name in collections:
+            for branch_name in branch_forms:
+                if branch_name.startswith(collection_name + "_"):
+                    processed_branches.add(branch_name)
+
+        # Find unrecognized branches
+        for branch_name, form in branch_forms.items():
+            if branch_name not in processed_branches:
+                # This is an unrecognized branch - treat as singleton with warning
+                warnings.warn(
+                    f"I identified a branch that likely does not have any leaves: '{branch_name}'. I will treat this as a 'singleton'. To suppress this warning, add this branch to the singletons set. [singleton-undefined]",
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
+                output[branch_name] = form
+
+        # Return discovered systematics (excluding NOSYS/nominal)
+        discovered_systematics = sorted([s for s in all_systematics if s != "NOSYS"])
+
+        return output.keys(), output.values(), discovered_systematics
+
+    def _discover_systematics(
+        self,
+        branch_forms: dict[str, Any],
+        collections: set[str],
+        subcollections: set[str],
+    ) -> set[str]:
+        """Extract systematic variations from branch names.
+
+        Returns:
+            set: Set of all systematic variation names found in branches
+        """
+        # Optimize systematic discovery: pre-index branches by pattern
+        # This avoids O(n*m) nested loops in systematic discovery
+        subcoll_patterns = {f"{subcoll}_" for subcoll in subcollections}
+
+        all_systematics = set()
+        for k in branch_forms:
+            if not ("_" in k and k not in self.singletons):
+                continue
+            # Handle the pattern: collection_subcollection_systematic
+            # where systematic can contain double underscores like "JET_EnergyResolution__1up"
+            parts = k.split("_")
+            if len(parts) < 3:
+                continue
+            # Find the collection and subcollection parts
+            collection = parts[0]
+            if collection not in collections:
+                continue
+            # Find where the subcollection ends by looking for a known pattern
+            # The systematic starts after the subcollection
+            remaining = "_".join(parts[1:])
+            # Use optimized lookup instead of iterating all subcollections
+            for pattern in subcoll_patterns:
+                if remaining.startswith(pattern):
+                    systematic = remaining[len(pattern) :]
+                    if systematic and systematic != "NOSYS":
+                        all_systematics.add(systematic)
+                    break
+
+        # Always include NOSYS as the nominal case
+        all_systematics.add("NOSYS")
+        return all_systematics
 
     @classmethod
     def behavior(cls) -> Behavior:

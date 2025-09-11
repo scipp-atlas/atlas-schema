@@ -146,6 +146,57 @@ which produces
 
 <img src="https://raw.githubusercontent.com/scipp-atlas/atlas-schema/main/docs/_static/img/ph_pt.png" alt="three stacked histograms of photon pT, with each stack corresponding to: no selection, requiring the isEM flag, and inverting the isEM requirement" width="500" style="display: block; margin-left: auto; margin-right: auto;">
 
+## Processing with Systematic Variations
+
+For analyses requiring systematic uncertainty evaluation, you can easily iterate
+over all systematic variations using the new `events["NOSYS"]` alias and
+`systematic_names` property:
+
+```python
+import awkward as ak
+from hist import Hist
+from coffea import processor
+from atlas_schema.schema import NtupleSchema
+
+
+class SystematicsProcessor(processor.ProcessorABC):
+    def __init__(self):
+        self.h = (
+            Hist.new.StrCat([], name="variation", growth=True)
+            .Regular(50, 0.0, 500.0, name="jet_pt", label="Leading Jet $p_T$ [GeV]")
+            .Int64()
+        )
+
+    def process(self, events):
+        dsid = events.metadata["dataset"]
+
+        # Process all systematic variations including nominal ("NOSYS")
+        for variation in events.systematic_names:
+            event_view = events[variation]
+
+            # Fill histogram with leading jet pT for this systematic variation
+            leading_jet_pt = event_view.jet.pt[:, 0] / 1_000  # Convert MeV to GeV
+            weights = (
+                event_view.weight.mc
+                if hasattr(event_view, "weight")
+                else ak.ones_like(leading_jet_pt)
+            )
+
+            self.h.fill(variation=variation, jet_pt=leading_jet_pt, weight=weights)
+
+        return {
+            "hist": self.h,
+            "meta": {"sumw": {dsid: {(events.metadata["fileuuid"], ak.sum(weights))}}},
+        }
+
+    def postprocess(self, accumulator):
+        return accumulator
+```
+
+This approach allows you to seamlessly process both nominal and systematic
+variations in a single loop, eliminating the need for special-case handling of
+the nominal variation.
+
 <!-- SPHINX-END -->
 
 ## Developer Notes

@@ -18,22 +18,127 @@ behavior.update(base.behavior)
 behavior.update(candidate.behavior)
 
 
-class NtupleEvents(behavior["NanoEvents"]):  # type: ignore[misc, valid-type, name-defined]
-    def __repr__(self):
-        return f"<event {getattr(self, 'runNumber', '??')}:\
-                {getattr(self, 'eventNumber', '??')}:\
-                {getattr(self, 'mcChannelNumber', '??')}>"
-
-
-behavior["NanoEvents"] = NtupleEvents
-
-
 def _set_repr_name(classname):
     def namefcn(_self):
         return classname
 
     behavior[("__typestr__", classname)] = classname[0].lower() + classname[1:]
     behavior[classname].__repr__ = namefcn
+
+
+class NtupleEvents(behavior["NanoEvents"]):  # type: ignore[misc, valid-type, name-defined]
+    """Individual systematic variation of events."""
+
+    def __repr__(self):
+        return f"<event {getattr(self, 'runNumber', '??')}:{getattr(self, 'eventNumber', '??')}:{getattr(self, 'mcChannelNumber', '??')}>"
+
+    def __getitem__(self, key):
+        """Support accessing systematic variations via bracket notation.
+
+        Args:
+            key: The systematic variation name. "NOSYS" returns the nominal events.
+
+        Returns:
+            The requested systematic variation or nominal events for "NOSYS".
+        """
+        if key == "NOSYS":
+            return self
+        return super().__getitem__(key)
+
+    @property
+    def systematic(self):
+        """Get the systematic variation name for this event collection."""
+        return "nominal"
+
+    @property
+    def systematic_names(self):
+        """Get all systematic variations available in this event collection.
+
+        Returns a list of systematic variation names, including 'NOSYS' for nominal.
+        """
+        # Get systematics from metadata stored during schema building
+        systematics = self.metadata.get("systematics", [])
+        return ["NOSYS", *systematics]
+
+    @property
+    def systematics(self):
+        """Get all systematic variations available in this event collection.
+
+        Returns a list of systematic variation names, excluding 'nominal'.
+        """
+        # Get systematics from metadata stored during schema building
+        return [
+            getattr(self, systematic)
+            for systematic in self.systematic_names
+            if systematic != "NOSYS"
+        ]
+
+
+behavior["NtupleEvents"] = NtupleEvents
+
+
+class NtupleEventsArray(behavior[("*", "NanoEvents")]):  # type: ignore[misc, valid-type, name-defined]
+    """Collection of NtupleEvents objects, one for each systematic variation."""
+
+    def __getitem__(self, key):
+        """Support accessing systematic variations via bracket notation.
+
+        Args:
+            key: The systematic variation name. "NOSYS" returns the nominal events.
+
+        Returns:
+            The requested systematic variation or nominal events for "NOSYS".
+        """
+        if key == "NOSYS":
+            return self
+        return super().__getitem__(key)
+
+    @property
+    def systematic_names(self):
+        """Get all systematic variations available in this event collection.
+
+        Returns a list of systematic variation names, including 'NOSYS' for nominal.
+        """
+        # Get systematics from metadata stored during schema building
+        systematics = self.metadata.get("systematics", [])
+        return ["NOSYS", *systematics]
+
+    @property
+    def systematics(self):
+        """Get all systematic variations available in this event collection.
+
+        Returns a list of systematic variation names, excluding 'nominal'.
+        """
+        # Get systematics from metadata stored during schema building
+        return [
+            getattr(self, systematic)
+            for systematic in self.systematic_names
+            if systematic != "NOSYS"
+        ]
+
+
+behavior[("*", "NtupleEvents")] = NtupleEventsArray
+
+
+@awkward.mixin_class(behavior)
+class Systematic(base.NanoCollection, base.Systematic):
+    """Base class for systematic variations."""
+
+    @property
+    def metadata(self):
+        """Arbitrary metadata"""
+        return self.layout.purelist_parameter("metadata")  # pylint: disable=no-member
+
+    @property
+    def systematic(self):
+        """Get the systematic variation name for this event collection."""
+        return self.metadata["systematic"]
+
+    def __repr__(self):
+        return f"<event {self.systematic}>"
+
+
+_set_repr_name("Systematic")
 
 
 @awkward.mixin_class(behavior)
@@ -50,7 +155,7 @@ class Pass(base.NanoCollection, base.Systematic): ...
 _set_repr_name("Pass")
 
 behavior.update(
-    awkward._util.copy_behaviors("PtEtaPhiMLorentzVector", "Particle", behavior)
+    awkward._util.copy_behaviors("PtEtaPhiMLorentzVector", "Particle", behavior)  # pylint: disable=protected-access
 )
 
 
@@ -88,17 +193,19 @@ class Particle(vector.PtEtaPhiMLorentzVector):
 
 _set_repr_name("Particle")
 
-ParticleArray.ProjectionClass2D = vector.TwoVectorArray  # noqa: F821
-ParticleArray.ProjectionClass3D = vector.ThreeVectorArray  # noqa: F821
-ParticleArray.ProjectionClass4D = ParticleArray  # noqa: F821
-ParticleArray.MomentumClass = vector.LorentzVectorArray  # noqa: F821
+ParticleArray.ProjectionClass2D = vector.TwoVectorArray  # noqa: F821  # pylint: disable=undefined-variable,no-member
+ParticleArray.ProjectionClass3D = vector.ThreeVectorArray  # noqa: F821  # pylint: disable=undefined-variable,no-member
+ParticleArray.ProjectionClass4D = ParticleArray  # noqa: F821  # pylint: disable=undefined-variable
+ParticleArray.MomentumClass = vector.LorentzVectorArray  # noqa: F821  # pylint: disable=undefined-variable,no-member
 
 
-behavior.update(awkward._util.copy_behaviors("PolarTwoVector", "MissingET", behavior))
+behavior.update(awkward._util.copy_behaviors("PolarTwoVector", "MissingET", behavior))  # pylint: disable=protected-access
 
 
 @awkward.mixin_class(behavior)
 class MissingET(vector.PolarTwoVector, base.NanoCollection, base.Systematic):
+    """Missing transverse energy collection."""
+
     @property
     def r(self):
         """Distance from origin in XY plane"""
@@ -107,16 +214,18 @@ class MissingET(vector.PolarTwoVector, base.NanoCollection, base.Systematic):
 
 _set_repr_name("MissingET")
 
-MissingETArray.ProjectionClass2D = MissingETArray  # noqa: F821
-MissingETArray.ProjectionClass3D = vector.SphericalThreeVectorArray  # noqa: F821
-MissingETArray.ProjectionClass4D = vector.LorentzVectorArray  # noqa: F821
-MissingETArray.MomentumClass = MissingETArray  # noqa: F821
+MissingETArray.ProjectionClass2D = MissingETArray  # noqa: F821  # pylint: disable=undefined-variable
+MissingETArray.ProjectionClass3D = vector.SphericalThreeVectorArray  # noqa: F821  # pylint: disable=undefined-variable,no-member
+MissingETArray.ProjectionClass4D = vector.LorentzVectorArray  # noqa: F821  # pylint: disable=undefined-variable,no-member
+MissingETArray.MomentumClass = MissingETArray  # noqa: F821  # pylint: disable=undefined-variable
 
-behavior.update(awkward._util.copy_behaviors("Particle", "Photon", behavior))
+behavior.update(awkward._util.copy_behaviors("Particle", "Photon", behavior))  # pylint: disable=protected-access
 
 
 @awkward.mixin_class(behavior)
 class Photon(Particle, base.NanoCollection, base.Systematic):
+    """Photon particle collection."""
+
     @property
     def mass(self):
         """Return zero mass for photon."""
@@ -129,82 +238,90 @@ class Photon(Particle, base.NanoCollection, base.Systematic):
 
     @property
     def isEM(self):
-        return self.isEM_syst.NOSYS == 0
+        return self.isEM_syst.NOSYS == 0  # pylint: disable=no-member
 
     def pass_isEM(self, words: list[PhotonID]):
         # 0 is pass, 1 is fail
         return (
-            self.isEM_syst.NOSYS & reduce(ior, (1 << word.value for word in words))
+            self.isEM_syst.NOSYS & reduce(ior, (1 << word.value for word in words))  # pylint: disable=no-member
         ) == 0
 
 
 _set_repr_name("Photon")
 
-PhotonArray.ProjectionClass2D = vector.TwoVectorArray  # noqa: F821
-PhotonArray.ProjectionClass3D = vector.ThreeVectorArray  # noqa: F821
-PhotonArray.ProjectionClass4D = PhotonArray  # noqa: F821
-PhotonArray.MomentumClass = vector.LorentzVectorArray  # noqa: F821
+PhotonArray.ProjectionClass2D = vector.TwoVectorArray  # noqa: F821  # pylint: disable=undefined-variable,no-member
+PhotonArray.ProjectionClass3D = vector.ThreeVectorArray  # noqa: F821  # pylint: disable=undefined-variable,no-member
+PhotonArray.ProjectionClass4D = PhotonArray  # noqa: F821  # pylint: disable=undefined-variable
+PhotonArray.MomentumClass = vector.LorentzVectorArray  # noqa: F821  # pylint: disable=undefined-variable,no-member
 
-behavior.update(awkward._util.copy_behaviors("Particle", "Electron", behavior))
+behavior.update(awkward._util.copy_behaviors("Particle", "Electron", behavior))  # pylint: disable=protected-access
 
 
 @awkward.mixin_class(behavior)
 class Electron(Particle, base.NanoCollection, base.Systematic):
+    """Electron particle collection."""
+
     @property
     def mass(self):
         """Electron mass in MeV"""
-        return awkward.ones_like(self.pt) * particle.literals.e_minus.mass
+        return awkward.ones_like(self.pt) * particle.literals.e_minus.mass  # pylint: disable=no-member
 
 
 _set_repr_name("Electron")
 
-ElectronArray.ProjectionClass2D = vector.TwoVectorArray  # noqa: F821
-ElectronArray.ProjectionClass3D = vector.ThreeVectorArray  # noqa: F821
-ElectronArray.ProjectionClass4D = ElectronArray  # noqa: F821
-ElectronArray.MomentumClass = vector.LorentzVectorArray  # noqa: F821
+ElectronArray.ProjectionClass2D = vector.TwoVectorArray  # noqa: F821  # pylint: disable=undefined-variable,no-member
+ElectronArray.ProjectionClass3D = vector.ThreeVectorArray  # noqa: F821  # pylint: disable=undefined-variable,no-member
+ElectronArray.ProjectionClass4D = ElectronArray  # noqa: F821  # pylint: disable=undefined-variable
+ElectronArray.MomentumClass = vector.LorentzVectorArray  # noqa: F821  # pylint: disable=undefined-variable,no-member
 
-behavior.update(awkward._util.copy_behaviors("Particle", "Muon", behavior))
+behavior.update(awkward._util.copy_behaviors("Particle", "Muon", behavior))  # pylint: disable=protected-access
 
 
 @awkward.mixin_class(behavior)
 class Muon(Particle, base.NanoCollection, base.Systematic):
+    """Muon particle collection."""
+
     @property
     def mass(self):
         """Muon mass in MeV"""
-        return awkward.ones_like(self.pt) * particle.literals.mu_minus.mass
+        return awkward.ones_like(self.pt) * particle.literals.mu_minus.mass  # pylint: disable=no-member
 
 
 _set_repr_name("Muon")
 
-MuonArray.ProjectionClass2D = vector.TwoVectorArray  # noqa: F821
-MuonArray.ProjectionClass3D = vector.ThreeVectorArray  # noqa: F821
-MuonArray.ProjectionClass4D = MuonArray  # noqa: F821
-MuonArray.MomentumClass = vector.LorentzVectorArray  # noqa: F821
+MuonArray.ProjectionClass2D = vector.TwoVectorArray  # noqa: F821  # pylint: disable=undefined-variable,no-member
+MuonArray.ProjectionClass3D = vector.ThreeVectorArray  # noqa: F821  # pylint: disable=undefined-variable,no-member
+MuonArray.ProjectionClass4D = MuonArray  # noqa: F821  # pylint: disable=undefined-variable
+MuonArray.MomentumClass = vector.LorentzVectorArray  # noqa: F821  # pylint: disable=undefined-variable,no-member
 
-behavior.update(awkward._util.copy_behaviors("Particle", "Tau", behavior))
+behavior.update(awkward._util.copy_behaviors("Particle", "Tau", behavior))  # pylint: disable=protected-access
 
 
 @awkward.mixin_class(behavior)
 class Tau(Particle, base.NanoCollection, base.Systematic):
+    """Tau particle collection."""
+
     @property
     def mass(self):
         """Tau mass in MeV"""
-        return awkward.ones_like(self.pt) * particle.literals.tau_minus.mass
+        return awkward.ones_like(self.pt) * particle.literals.tau_minus.mass  # pylint: disable=no-member
 
 
 _set_repr_name("Tau")
 
-TauArray.ProjectionClass2D = vector.TwoVectorArray  # noqa: F821
-TauArray.ProjectionClass3D = vector.ThreeVectorArray  # noqa: F821
-TauArray.ProjectionClass4D = TauArray  # noqa: F821
-TauArray.MomentumClass = vector.LorentzVectorArray  # noqa: F821
+TauArray.ProjectionClass2D = vector.TwoVectorArray  # noqa: F821  # pylint: disable=undefined-variable,no-member
+TauArray.ProjectionClass3D = vector.ThreeVectorArray  # noqa: F821  # pylint: disable=undefined-variable,no-member
+TauArray.ProjectionClass4D = TauArray  # noqa: F821  # pylint: disable=undefined-variable
+TauArray.MomentumClass = vector.LorentzVectorArray  # noqa: F821  # pylint: disable=undefined-variable,no-member
 
 
-behavior.update(awkward._util.copy_behaviors("Particle", "Jet", behavior))
+behavior.update(awkward._util.copy_behaviors("Particle", "Jet", behavior))  # pylint: disable=protected-access
 
 
 @awkward.mixin_class(behavior)
 class Jet(Particle, base.NanoCollection, base.Systematic):
+    """Jet particle collection."""
+
     @property
     def mass(self):
         r"""Invariant mass (+, -, -, -)
@@ -216,31 +333,31 @@ class Jet(Particle, base.NanoCollection, base.Systematic):
 
 _set_repr_name("Jet")
 
-JetArray.ProjectionClass2D = vector.TwoVectorArray  # noqa: F821
-JetArray.ProjectionClass3D = vector.ThreeVectorArray  # noqa: F821
-JetArray.ProjectionClass4D = JetArray  # noqa: F821
-JetArray.MomentumClass = vector.LorentzVectorArray  # noqa: F821
+JetArray.ProjectionClass2D = vector.TwoVectorArray  # noqa: F821  # pylint: disable=undefined-variable,no-member
+JetArray.ProjectionClass3D = vector.ThreeVectorArray  # noqa: F821  # pylint: disable=undefined-variable,no-member
+JetArray.ProjectionClass4D = JetArray  # noqa: F821  # pylint: disable=undefined-variable
+JetArray.MomentumClass = vector.LorentzVectorArray  # noqa: F821  # pylint: disable=undefined-variable,no-member
 
 __all__ = [
     "Electron",
-    "ElectronArray",  # noqa: F822
-    "ElectronRecord",  # noqa: F822
+    "ElectronArray",  # noqa: F822  # pylint: disable=undefined-all-variable
+    "ElectronRecord",  # noqa: F822  # pylint: disable=undefined-all-variable
     "Jet",
-    "JetArray",  # noqa: F822
-    "JetRecord",  # noqa: F822
+    "JetArray",  # noqa: F822  # pylint: disable=undefined-all-variable
+    "JetRecord",  # noqa: F822  # pylint: disable=undefined-all-variable
     "MissingET",
-    "MissingETArray",  # noqa: F822
-    "MissingETRecord",  # noqa: F822
+    "MissingETArray",  # noqa: F822  # pylint: disable=undefined-all-variable
+    "MissingETRecord",  # noqa: F822  # pylint: disable=undefined-all-variable
     "Muon",
-    "MuonArray",  # noqa: F822
-    "MuonRecord",  # noqa: F822
+    "MuonArray",  # noqa: F822  # pylint: disable=undefined-all-variable
+    "MuonRecord",  # noqa: F822  # pylint: disable=undefined-all-variable
     "NtupleEvents",
     "Particle",
-    "ParticleArray",  # noqa: F822
-    "ParticleRecord",  # noqa: F822
+    "ParticleArray",  # noqa: F822  # pylint: disable=undefined-all-variable
+    "ParticleRecord",  # noqa: F822  # pylint: disable=undefined-all-variable
     "Pass",
     "Photon",
-    "PhotonArray",  # noqa: F822
-    "PhotonRecord",  # noqa: F822
+    "PhotonArray",  # noqa: F822  # pylint: disable=undefined-all-variable
+    "PhotonRecord",  # noqa: F822  # pylint: disable=undefined-all-variable
     "Weight",
 ]
