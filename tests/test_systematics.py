@@ -238,3 +238,25 @@ def test_nosys_collections_accessible(event_id_fields, systematic_variation_fiel
     assert ak.all(nosys_events.mu.pt == events.mu.pt), (
         "NOSYS mu pt should match original"
     )
+
+
+def test_nosys_getitem_fallback(event_id_fields, systematic_variation_fields):
+    """Test that non-NOSYS keys fall back to super().__getitem__."""
+    array = {**event_id_fields, **systematic_variation_fields}
+    src = SimplePreloadedColumnSource(array, uuid4(), 3, object_path="/Events")
+    events = NanoEventsFactory.from_preloaded(
+        src, metadata={"dataset": "test_fallback"}, schemaclass=NtupleSchema
+    ).events()
+
+    # Test accessing a systematic variation through bracket notation
+    systematic_events = events["JET_EnergyResolution__1up"]
+    assert systematic_events is not events, (
+        "Systematic variation should be different object"
+    )
+    assert hasattr(systematic_events, "jet"), (
+        "Systematic variation should have jet collection"
+    )
+
+    # Test accessing an invalid key to ensure super().__getitem__ is called
+    with pytest.raises(ak.errors.FieldNotFoundError):
+        _ = events["nonexistent_systematic"]
