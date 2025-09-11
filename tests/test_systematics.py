@@ -157,3 +157,84 @@ def test_systematic_variations(event_id_fields, systematic_variation_fields):
         # assert ak.all(el_syst_pt == expected_el_syst), "Electron systematic variation should match expected values"
 
     print("\n=== Test completed successfully! ===")
+
+
+def test_nosys_alias_returns_same_object(event_id_fields, systematic_variation_fields):
+    """Test that events["NOSYS"] returns the same object as events."""
+    array = {**event_id_fields, **systematic_variation_fields}
+    src = SimplePreloadedColumnSource(array, uuid4(), 3, object_path="/Events")
+    events = NanoEventsFactory.from_preloaded(
+        src, metadata={"dataset": "test_nosys_alias"}, schemaclass=NtupleSchema
+    ).events()
+
+    nosys_events = events["NOSYS"]
+    assert nosys_events is events, (
+        "events['NOSYS'] should return the same object as events"
+    )
+
+
+def test_systematic_names_includes_nosys(event_id_fields, systematic_variation_fields):
+    """Test that systematic_names includes NOSYS as the first entry."""
+    array = {**event_id_fields, **systematic_variation_fields}
+    src = SimplePreloadedColumnSource(array, uuid4(), 3, object_path="/Events")
+    events = NanoEventsFactory.from_preloaded(
+        src, metadata={"dataset": "test_systematic_names"}, schemaclass=NtupleSchema
+    ).events()
+
+    assert "NOSYS" in events.systematic_names, "systematic_names should include 'NOSYS'"
+    assert events.systematic_names[0] == "NOSYS", (
+        "NOSYS should be first in systematic_names"
+    )
+
+
+def test_nosys_iteration_pattern(event_id_fields, systematic_variation_fields):
+    """Test the clean iteration pattern with NOSYS support."""
+    array = {**event_id_fields, **systematic_variation_fields}
+    src = SimplePreloadedColumnSource(array, uuid4(), 3, object_path="/Events")
+    events = NanoEventsFactory.from_preloaded(
+        src, metadata={"dataset": "test_iteration"}, schemaclass=NtupleSchema
+    ).events()
+
+    # Test the iteration pattern that was requested
+    for variation in events.systematic_names:
+        event_view = events[variation]
+
+        if variation == "NOSYS":
+            # Should be the same object
+            assert event_view is events, (
+                f"events['{variation}'] should be the same as events"
+            )
+            # Should have access to collections
+            assert hasattr(event_view, "jet"), "NOSYS events should have jet collection"
+        else:
+            # Should be a systematic variation
+            assert hasattr(event_view, "jet"), (
+                f"Variation {variation} should have jet collection"
+            )
+
+
+def test_nosys_collections_accessible(event_id_fields, systematic_variation_fields):
+    """Test that collections are accessible through NOSYS alias."""
+    array = {**event_id_fields, **systematic_variation_fields}
+    src = SimplePreloadedColumnSource(array, uuid4(), 3, object_path="/Events")
+    events = NanoEventsFactory.from_preloaded(
+        src, metadata={"dataset": "test_collections"}, schemaclass=NtupleSchema
+    ).events()
+
+    nosys_events = events["NOSYS"]
+
+    # Test that we can access collections through the NOSYS alias
+    assert hasattr(nosys_events, "jet"), "NOSYS events should have jet collection"
+    assert hasattr(nosys_events, "el"), "NOSYS events should have el collection"
+    assert hasattr(nosys_events, "mu"), "NOSYS events should have mu collection"
+
+    # Test that the data is the same
+    assert ak.all(nosys_events.jet.pt == events.jet.pt), (
+        "NOSYS jet pt should match original"
+    )
+    assert ak.all(nosys_events.el.pt == events.el.pt), (
+        "NOSYS el pt should match original"
+    )
+    assert ak.all(nosys_events.mu.pt == events.mu.pt), (
+        "NOSYS mu pt should match original"
+    )

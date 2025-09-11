@@ -32,6 +32,19 @@ class NtupleEvents(behavior["NanoEvents"]):  # type: ignore[misc, valid-type, na
     def __repr__(self):
         return f"<event {getattr(self, 'runNumber', '??')}:{getattr(self, 'eventNumber', '??')}:{getattr(self, 'mcChannelNumber', '??')}>"
 
+    def __getitem__(self, key):
+        """Support accessing systematic variations via bracket notation.
+
+        Args:
+            key: The systematic variation name. "NOSYS" returns the nominal events.
+
+        Returns:
+            The requested systematic variation or nominal events for "NOSYS".
+        """
+        if key == "NOSYS":
+            return self
+        return super().__getitem__(key)
+
     @property
     def systematic(self):
         """Get the systematic variation name for this event collection."""
@@ -41,10 +54,11 @@ class NtupleEvents(behavior["NanoEvents"]):  # type: ignore[misc, valid-type, na
     def systematic_names(self):
         """Get all systematic variations available in this event collection.
 
-        Returns a list of systematic variation names, excluding 'nominal'.
+        Returns a list of systematic variation names, including 'NOSYS' for nominal.
         """
         # Get systematics from metadata stored during schema building
-        return self.metadata.get("systematics", [])
+        systematics = self.metadata.get("systematics", [])
+        return ["NOSYS", *systematics]
 
     @property
     def systematics(self):
@@ -62,14 +76,28 @@ behavior["NtupleEvents"] = NtupleEvents
 class NtupleEventsArray(behavior[("*", "NanoEvents")]):  # type: ignore[misc, valid-type, name-defined]
     """Collection of NtupleEvents objects, one for each systematic variation."""
 
+    def __getitem__(self, key):
+        """Support accessing systematic variations via bracket notation.
+
+        Args:
+            key: The systematic variation name. "NOSYS" returns the nominal events.
+
+        Returns:
+            The requested systematic variation or nominal events for "NOSYS".
+        """
+        if key == "NOSYS":
+            return self
+        return super().__getitem__(key)
+
     @property
     def systematic_names(self):
         """Get all systematic variations available in this event collection.
 
-        Returns a list of systematic variation names, excluding 'nominal'.
+        Returns a list of systematic variation names, including 'NOSYS' for nominal.
         """
         # Get systematics from metadata stored during schema building
-        return self.metadata.get("systematics", [])
+        systematics = self.metadata.get("systematics", [])
+        return ["NOSYS", *systematics]
 
     @property
     def systematics(self):
