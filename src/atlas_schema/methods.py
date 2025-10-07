@@ -41,7 +41,7 @@ class NtupleEvents(behavior["NanoEvents"]):  # type: ignore[misc, valid-type, na
         Returns:
             The requested systematic variation or nominal events for "NOSYS".
         """
-        if key == "NOSYS":
+        if isinstance(key, str) and key == "NOSYS":
             return self
         return super().__getitem__(key)
 
@@ -89,7 +89,7 @@ class NtupleEventsArray(behavior[("*", "NanoEvents")]):  # type: ignore[misc, va
         Returns:
             The requested systematic variation or nominal events for "NOSYS".
         """
-        if key == "NOSYS":
+        if isinstance(key, str) and key == "NOSYS":
             return self
         return super().__getitem__(key)
 

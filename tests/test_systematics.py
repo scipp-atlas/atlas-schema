@@ -319,3 +319,37 @@ def test_repr_methods(event_id_fields, systematic_variation_fields):
     assert "event JET_EnergyResolution__1up" in syst_repr, (
         "Systematic repr should contain systematic name"
     )
+
+
+def test_getitem_with_boolean_mask(event_id_fields, systematic_variation_fields):
+    """Regression test for issue where events[boolean_mask] fails with typetracer arrays.
+
+    This test ensures that NtupleEventsArray.__getitem__ properly handles boolean masks
+    without triggering comparison operations that fail with virtual/typetracer arrays.
+    The bug occurred because the __getitem__ method checked `if key == "NOSYS"` without
+    first verifying that key is a string, causing numpy ufunc errors with array keys.
+    """
+    array = {**event_id_fields, **systematic_variation_fields}
+    src = SimplePreloadedColumnSource(array, uuid4(), 3, object_path="/Events")
+    events = NanoEventsFactory.from_preloaded(
+        src, metadata={"dataset": "test_boolean_mask"}, schemaclass=NtupleSchema
+    ).events()
+
+    # Create a boolean mask (similar to the failing example: events[cut])
+    # This simulates: cut = ak.all(events.ph.isEM, axis=1); events[cut]
+    mask = ak.Array([True, False, True])
+
+    # This should work without raising an AssertionError
+    filtered_events = events[mask]
+
+    # Verify the filtering worked correctly
+    assert len(filtered_events) == 2, "Should have 2 events after filtering"
+    assert ak.all(filtered_events.eventNumber == ak.Array([[123456789], [123456791]]))
+
+    # Also test that string keys still work
+    nosys_events = events["NOSYS"]
+    assert nosys_events is events, "String key 'NOSYS' should still work"
+
+    # Test with systematic variation
+    syst_events = events["JET_EnergyResolution__1up"]
+    assert syst_events is not events, "Systematic variation should be different object"
