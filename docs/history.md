@@ -14,6 +14,23 @@ and this project adheres to
 
 **_Fixed:_**
 
+(atlas-schema-v0.4.1)=
+
+## [0.4.1](https://github.com/scipp-atlas/atlas-schema/releases/tag/v0.4.1) - 2025-10-07
+
+**_Fixed:_**
+
+- bug-fix from introduction of systematic variation support in event-level
+  masking {pr}`75`
+
+(atlas-schema-v0.4.0)=
+
+## [0.4.0](https://github.com/scipp-atlas/atlas-schema/releases/tag/v0.4.0) - 2025-09-11
+
+**_Added:_**
+
+- systematic variation support! {pr}`66`
+
 (atlas-schema-v0.3.0)=
 
 ## [0.3.0](https://github.com/scipp-atlas/atlas-schema/releases/tag/v0.3.0) - 2025-07-29
