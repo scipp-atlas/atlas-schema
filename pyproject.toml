@@ -60,7 +60,7 @@ docs = [
 Homepage = "https://github.com/scipp-atlas/atlas-schema"
 "Bug Tracker" = "https://github.com/scipp-atlas/atlas-schema/issues"
 Discussions = "https://github.com/scipp-atlas/atlas-schema/discussions"
-Documentation = "https://atlas-schema.readthedocs.io/en/v0.4.0/"
+Documentation = "https://atlas-schema.readthedocs.io/en/v0.4.1/"
 Releases = "https://github.com/scipp-atlas/atlas-schema/releases"
 "Release Notes" = "https://atlas-schema.readthedocs.io/en/latest/history.html"
 
