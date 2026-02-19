@@ -56,4 +56,4 @@ I got this error...
 
 
 ... ``TypeError('size of array (X) is less than size of  form (Y)``
-   This is due to an issue with how Athena backfills events as described in https://github.com/scikit-hep/coffea/issues/1083 .
+   This is likely due to an issue with how Athena backfills events as described in https://github.com/scikit-hep/coffea/issues/1083 .
