@@ -49,3 +49,11 @@ How do I...
       RuntimeWarning: Missing singletons : ['singleton']. [singleton-missing]
 
   ``atlas-schema`` tries to be smart and let you know when you have singletons that need to be defined, and will also catch branches or collections you define that are not actually in the file. In most cases, these warnings are harmless and are to let you know about inconsistencies in how you run your code.
+
+
+I got this error...
+-------------------
+
+
+... ``TypeError('size of array (X) is less than size of  form (Y)``
+   This is likely due to an issue with how Athena backfills events as described in https://github.com/scikit-hep/coffea/issues/1083 .
