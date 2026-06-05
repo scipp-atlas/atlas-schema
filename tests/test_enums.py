@@ -15,5 +15,5 @@ def test_enum_multiple_access():
     assert Names["Bob"] == Names.Bob
     assert Names["Charlie"] == Names.Charlie
     assert Names["Alice", "Bob"] == [Names.Alice, Names.Bob]  # type:ignore[misc,comparison-overlap]
-    assert Names["Bob", "Alice"] == [Names.Bob, Names.Alice]  # type:ignore[misc,comparison-overlap]
-    assert Names["Charlie", "Alice", "Bob"] == [Names.Charlie, Names.Alice, Names.Bob]  # type:ignore[misc,comparison-overlap]
+    assert Names["Bob", "Alice"] == [Names.Bob, Names.Alice]  # type: ignore[unreachable]
+    assert Names["Charlie", "Alice", "Bob"] == [Names.Charlie, Names.Alice, Names.Bob]
