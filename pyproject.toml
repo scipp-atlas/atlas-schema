@@ -204,7 +204,7 @@ isort.required-imports = ["from __future__ import annotations"]
 typing-modules = ["atlas_schema.typing_compat"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["T20"]
+"tests/**" = ["T20", "ARG001"]
 "noxfile.py" = ["T20"]
 
 
