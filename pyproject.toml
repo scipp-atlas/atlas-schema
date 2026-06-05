@@ -162,6 +162,7 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = [
   'atlas_schema.methods.*',
+  'atlas_schema.transforms',
 ]
 ignore_errors = true
 

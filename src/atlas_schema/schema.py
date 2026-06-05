@@ -6,9 +6,9 @@ from collections.abc import KeysView, ValuesView
 from typing import Any, ClassVar
 
 import particle
-from coffea.nanoevents import transforms
 from coffea.nanoevents.schemas.base import BaseSchema, zip_forms
 
+from atlas_schema import transforms
 from atlas_schema.methods import behavior as roaster
 from atlas_schema.typing_compat import Behavior, Self
 
