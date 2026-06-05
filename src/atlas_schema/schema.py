@@ -5,6 +5,8 @@ import warnings
 from collections.abc import KeysView, ValuesView
 from typing import Any, ClassVar
 
+import particle
+from coffea.nanoevents import transforms
 from coffea.nanoevents.schemas.base import BaseSchema, zip_forms
 
 from atlas_schema.methods import behavior as roaster
@@ -164,6 +166,25 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
     #: default behavior to use for any collection (default ``"NanoCollection"``, from :class:`coffea.nanoevents.methods.base.NanoCollection`)
     default_behavior: ClassVar[str] = "NanoCollection"
 
+    #: fields to materialize as full_like arrays; keyed by behavior name.
+    #: Each entry maps new_field -> (source_field, fill_value).
+    full_like_items: ClassVar[dict[str, dict[str, tuple[str, float]]]] = {
+        "Photon": {"mass": ("pt", 0.0), "charge": ("pt", 0.0)},
+        "Electron": {"mass": ("pt", float(particle.literals.e_minus.mass))},
+        "Muon": {"mass": ("pt", float(particle.literals.mu_minus.mass))},
+        "Tau": {"mass": ("pt", float(particle.literals.tau_minus.mass))},
+    }
+    #: fields to rename; keyed by behavior name.
+    #: Each entry maps new_field -> old_field (old field is removed).
+    rename_items: ClassVar[dict[str, dict[str, str]]] = {
+        "Jet": {"mass": "m"},
+    }
+    #: fields to materialize as aliases of existing fields; keyed by behavior name.
+    #: Each entry maps new_field -> source_field (source field is kept).
+    alias_items: ClassVar[dict[str, dict[str, str]]] = {
+        "MissingET": {"rho": "met"},  # vector reads 'rho', not 'r' or 'met'
+    }
+
     def __init__(self, base_form: dict[str, Any], version: str = "latest"):
         super().__init__(base_form)
         self._version = version
@@ -186,6 +207,57 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
         to ensure NanoAODv7 compatibility.
         """
         return cls(base_form, version="1")
+
+    def _apply_vector_fields(
+        self, behavior_name: str, collection_content: dict[str, Any]
+    ) -> None:
+        """Materialize vector coordinate fields into collection_content in place.
+
+        Keyed by behavior name so custom collections mapped via mixins
+        (e.g. recojet_antikt4PFlow -> Jet) get the same treatment.
+        Silently skips if the source field is absent (optional branches).
+        Warns and skips if the target field already exists. [vector-field-exists]
+        """
+        for new_field, (source_field, fill_value) in self.full_like_items.get(
+            behavior_name, {}
+        ).items():
+            if source_field not in collection_content:
+                continue
+            if new_field in collection_content:
+                warnings.warn(
+                    f"Field '{new_field}' already present in collection with behavior "
+                    f"'{behavior_name}'; skipping materialization. [vector-field-exists]",
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
+                continue
+            collection_content[new_field] = transforms.full_like_from_content_form(
+                collection_content[source_field], fill_value
+            )
+        for new_field, old_field in self.rename_items.get(behavior_name, {}).items():
+            if old_field not in collection_content:
+                continue
+            if new_field in collection_content:
+                warnings.warn(
+                    f"Field '{new_field}' already present in collection with behavior "
+                    f"'{behavior_name}'; skipping rename of '{old_field}'. [vector-field-exists]",
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
+                continue
+            collection_content[new_field] = collection_content.pop(old_field)
+        for new_field, source_field in self.alias_items.get(behavior_name, {}).items():
+            if source_field not in collection_content:
+                continue
+            if new_field in collection_content:
+                warnings.warn(
+                    f"Field '{new_field}' already present in collection with behavior "
+                    f"'{behavior_name}'; skipping alias. [vector-field-exists]",
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
+                continue
+            collection_content[new_field] = collection_content[source_field]
 
     def _build_collections(
         self, field_names: list[str], input_contents: list[Any]
@@ -337,6 +409,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
                         RuntimeWarning,
                         stacklevel=2,
                     )
+                self._apply_vector_fields(behavior, collection_content)
                 nominal_collections[collection_name] = zip_forms(
                     collection_content, collection_name, record_name=behavior
                 )
@@ -408,6 +481,7 @@ class NtupleSchema(BaseSchema):  # type: ignore[misc]
                         ]
                     else:
                         # Build the systematic collection
+                        self._apply_vector_fields(behavior, collection_content)
                         systematic_collections[collection_name] = zip_forms(
                             collection_content, collection_name, record_name=behavior
                         )

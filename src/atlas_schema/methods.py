@@ -6,7 +6,6 @@ from functools import reduce
 from operator import ior
 
 import awkward
-import particle
 from coffea.nanoevents.methods import base, candidate, vector
 
 from atlas_schema.enums import PhotonID
@@ -206,11 +205,6 @@ behavior.update(awkward._util.copy_behaviors("PolarTwoVector", "MissingET", beha
 class MissingET(vector.PolarTwoVector, base.NanoCollection, base.Systematic):
     """Missing transverse energy collection."""
 
-    @property
-    def r(self):
-        """Distance from origin in XY plane"""
-        return self["met"]
-
 
 _set_repr_name("MissingET")
 
@@ -225,16 +219,6 @@ behavior.update(awkward._util.copy_behaviors("Particle", "Photon", behavior))  #
 @awkward.mixin_class(behavior)
 class Photon(Particle, base.NanoCollection, base.Systematic):
     """Photon particle collection."""
-
-    @property
-    def mass(self):
-        """Return zero mass for photon."""
-        return awkward.zeros_like(self.pt)
-
-    @property
-    def charge(self):
-        """Return zero charge for photon."""
-        return awkward.zeros_like(self.pt)
 
     @property
     def isEM(self):
@@ -261,11 +245,6 @@ behavior.update(awkward._util.copy_behaviors("Particle", "Electron", behavior)) 
 class Electron(Particle, base.NanoCollection, base.Systematic):
     """Electron particle collection."""
 
-    @property
-    def mass(self):
-        """Electron mass in MeV"""
-        return awkward.ones_like(self.pt) * particle.literals.e_minus.mass  # pylint: disable=no-member
-
 
 _set_repr_name("Electron")
 
@@ -280,11 +259,6 @@ behavior.update(awkward._util.copy_behaviors("Particle", "Muon", behavior))  # p
 @awkward.mixin_class(behavior)
 class Muon(Particle, base.NanoCollection, base.Systematic):
     """Muon particle collection."""
-
-    @property
-    def mass(self):
-        """Muon mass in MeV"""
-        return awkward.ones_like(self.pt) * particle.literals.mu_minus.mass  # pylint: disable=no-member
 
 
 _set_repr_name("Muon")
@@ -301,11 +275,6 @@ behavior.update(awkward._util.copy_behaviors("Particle", "Tau", behavior))  # py
 class Tau(Particle, base.NanoCollection, base.Systematic):
     """Tau particle collection."""
 
-    @property
-    def mass(self):
-        """Tau mass in MeV"""
-        return awkward.ones_like(self.pt) * particle.literals.tau_minus.mass  # pylint: disable=no-member
-
 
 _set_repr_name("Tau")
 
@@ -321,14 +290,6 @@ behavior.update(awkward._util.copy_behaviors("Particle", "Jet", behavior))  # py
 @awkward.mixin_class(behavior)
 class Jet(Particle, base.NanoCollection, base.Systematic):
     """Jet particle collection."""
-
-    @property
-    def mass(self):
-        r"""Invariant mass (+, -, -, -)
-
-        :math:`\sqrt{t^2-x^2-y^2-z^2}`
-        """
-        return self["m"]
 
 
 _set_repr_name("Jet")
