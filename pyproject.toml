@@ -94,6 +94,9 @@ exclude = []
 [tool.hatch.build.targets.wheel]
 packages = ["src/atlas_schema"]
 
+[tool.uv]
+exclude-newer = "7 days"
+
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = [
