@@ -1,7 +1,7 @@
 name: Semantic Pull Request
 
 on:
-  pull_request_target:
+  pull_request:
     types:
       - opened
       - edited
@@ -11,10 +11,14 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.number }}
   cancel-in-progress: true
 
+permissions: {}
+
 jobs:
   main:
     name: Validate PR title
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read # read PR title/metadata for conventional-commit validation
 
     steps:
       - name: Check PR title matches Conventional Commits spec
