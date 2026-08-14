@@ -40,7 +40,7 @@ def isin(element: Array, test_elements: ak.Array, axis: int = -1) -> Array:
     assert axis < element.ndim + 1, "axis too large for the element"
 
     # First, build up the transformation, with slice(None) indicating where to stick the test_elements
-    reshaper: list[None | slice] = [None] * element.ndim
+    reshaper: list[slice | None] = [None] * element.ndim
     axis = element.ndim if axis == -1 else axis
     reshaper.insert(axis, slice(None))
 
