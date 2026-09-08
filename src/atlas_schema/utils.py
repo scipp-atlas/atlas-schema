@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-from enum import Enum
 from typing import TypeVar, cast
 
 import awkward as ak
 
 Array = TypeVar("Array", bound=ak.Array)
-_E = TypeVar("_E", bound=Enum)
 
 
 def isin(element: Array, test_elements: ak.Array, axis: int = -1) -> Array:

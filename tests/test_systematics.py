@@ -130,15 +130,15 @@ def test_systematic_variations(event_id_fields, systematic_variation_fields):
         syst_events = getattr(events, syst)
         try:
             print(f"  Jet pt: {syst_events.jet.pt}")
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             print(f"  Jet pt error: {e}")
         try:
             print(f"  Electron pt: {syst_events.el.pt}")
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             print(f"  Electron pt error: {e}")
         try:
             print(f"  Muon pt (should fallback to nominal): {syst_events.mu.pt}")
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             print(f"  Muon pt error: {e}")
 
     # Test 5: Test that systematic variations have correct values
